@@ -82,16 +82,130 @@ B-->C[机器：参数学习]
 D[监督学习Supervised Learning]
 ```
 
-
 # 第二章 回归分析
 
 ## 概述
 
 ### 回归
+
 - [x] 对于给定的数据集： $D=\lbrace (x_1,y_1),(x_2,y_2),\dots ,(x_n,y_n)\rbrace$ ，其中 $x_i \in C=R^d,y_i \in Y=R$ ，是连续值(如果为分散值，则为分类而不是回归)
   > - 寻找 $C$ 上的映射函数： $f(x):C \rightarrow Y$
   > - 使得： $f(x_i) \approx y_i$
 
 ### 线性回归
-- [x] 
+
+- [x] 映射函数：线性函数 $f(x_i)=w·x_i+b$
+
+- [x] 对样本 $x_i$ 进行线性变换
+
+### 一元线性回归
+
+- [x] 映射函数：线性函数 $f(x_i)=w·x_i+b$
+
+- [x] 每个样本 $x_i$ 是一维的
+
+### 多元线性回归
+
+- [x] 实际应用场景中的变量大多具有多个属性
+  > - 例如，想对房价进行预测，房价的影响因素有多个属性：面积，房龄，楼层等
+  > - 假设房价与上述因素满足 `多元线性关系` ，需要寻找 `多元线性函数` 来预测房价： $房价=面积×w_1+房龄×w_2+楼层×w_3+b$
+
+### 非线性回归
+
+- [x] 线性函数无法准确拟合变量之间的关系时，使用更复杂的非线性回归方法，也就是将数据拟合为非一次方程的模式
+
+### 性能评价
+
+- [x] 为了使得回归模型的预测值和回归目标尽可能接近。常使用 `均方误差` 衡量性能
+
+$$E(F;D)=\frac{1}{n} \sum\limits_{i=1}^n (f(x_i)-y_i)^2$$
+
 ## 线性回归
+
+### 问题定义
+- [x] 目标：寻找最优线性回归函数
+
+$$f(x_i)=w_1x_{i1}+w_2x_{i2}+ \dots +w_dx_{id}+b=\omega ^Tx_i+b$$
+
+> **注： $x_i$ 和 $\omega$ 在此处均为d维向量，即 $x_i ,\omega \in R^d$**
+
+- [x] 如何获得最优解参数 $\omega ^{\*}$ 和 $b^{\*}$ ?
+  > - 方法一：最小二乘法————将误差最小化
+  > - 方法二：极大似然法————将概率最大化
+
+### 最小二乘法
+
+#### 一元线性回归
+
+- [x] 一元情况，即 `样本属性是一维的` ，向量 $x_i$ 在此处为一个值，线性回归模型试图学得： $f(x)=\omega x+b$ ，使得 $f(x_i) \approx y_i$
+
+- [x] 使用 `均方误差` 来衡量预测结果与回归目标之间的误差：
+
+$$E(F;D)=\frac{1}{n} \sum\limits_{i=1}^n (f(x_i)-y_i)^2 = \frac{1}{n} \sum\limits_{i=1}^n (\omega x_i +b-y_i)^2$$
+
+- [x] 最小二乘法的目标是使得 `均方误差最小化` :
+
+$$(\omega ^{\*},b^{\*})=\underset{\substack{(\omega, b)}}{\arg\min} E(F;D)=\underset{\substack{(\omega, b)}}{\arg\min} \sum\limits _{i=1}^n (\omega x_i +b-y_i)^2$$
+
+> **注：此处的 `arg` 就是对 $\frac{1}{n}$ 的一种简写，也就是求平均**
+
+##### 一元线性回归如何求解最优参数
+- [x] $(\omega ^{\*},b^{\*})=\underset{\substack{(\omega, b)}}{\arg\min} \sum\limits _{i=1}^n (\omega x_i +b-y_i)^2$ 怎么求解最优的 $(\omega ^{\*},b^{\*})$
+
+> 由于 $\sum\limits _{i=1}^n (\omega x_i +b-y_i)^2$ 是关于 $\omega ,b$ 的二次函数，，所以二次极值点只有一个，所以存在唯一的全局最优解。
+> > 证明：对于二元二次函数而言不难有假设 $g(x,y)=ax^2+by^2+cxy+dx+ey+f$ ，那么对于极值点 $(x_0,y_0)$ 而言有
+
+$$\begin{cases}
+g _x(x_0,y_0) = \frac{\partial g}{\partial x}| _{x=x_0,y=y_0} =0\newline
+g _y(x_0,y_0) = \frac{\partial g}{\partial y}| _{x=x_0,y=y_0} =0\newline
+\end{cases}$$
+
+> > 带入 $g(x,y)=ax^2+by^2+cxy+dx+ey+f$ 到上述方程组则有方程组
+
+$$\begin{cases}
+g _x(x_0,y_0) =2ax_0 +cy_0 +d=0\newline
+g _y(x_0,y_0) =2by_0 +cx_0 +e=0\newline
+\end{cases}$$
+
+> > 解得
+
+$$\begin{cases}
+x_0=\frac{ec-2bd}{4ab-c^2} \newline
+y_0=\frac{2ae-cd}{4ab-c^2} \newline
+\end{cases}
+$$
+
+> > 上述可以看出来只有唯一一个极值点，故存在唯一的全局最优解，因为很明显，对于回归问题中的 $a,b$ 都是非负值，一定存在唯一极小值点，故存在全局最优解
+
+> 所以回到回归问题中，求最优的 $(\omega ^{\*},b^{\*})$ 即对 $\sum\limits _{i=1}^n (\omega x_i +b-y_i)^2$ 求偏导即可，即有
+
+$$\begin{cases}
+\frac{\partial E(\omega ,b)}{\partial \omega}=0 \newline
+\frac{\partial E(\omega ,b)}{\partial b}=0 \newline
+\end{cases} \rightarrow 
+\begin{cases}
+\sum\limits_{i=1}^n 2(\omega x_i +b-y_i)x_i = 2\left(w\sum\limits_{i=1}^n x_i^2-\sum\limits_{i=1}^n (y_i-b)x_i\right)=0 \newline
+\sum\limits_{i=1}^n 2(\omega x_i +b-y_i)=2nb+2\sum\limits_{i=1}^n (\omega x_i-y_i)=2\left(nb-\sum\limits_{i=1}^n (y_i-\omega x_i)\right)=0 \newline
+\end{cases} \rightarrow
+\begin{cases}
+\omega^{\*}=\frac{\sum\limits _{i=1}^n y _i(x _i- \overline{x})}{\sum\limits _{i=1}^n x_i^2- \frac{1}{n}\left(\sum\limits _{i=1}^n x_i \right)^2} , & \text{其中} \overline{x}=\frac{1}{n} \sum\limits _{i=1}^n x_i\newline
+b^{\*}=\frac{1}{n} \sum\limits _{i=1}^n (y_i- \omega x_i)\newline
+\end{cases}$$
+
+#### 多元线性回归
+
+- [x] 多元线性回归同样通过最小化均方误差来对 $\omega,b$ 进行估计
+  > - 回归函数 $f(x_i)=w_1x_{i1}+w_2x_{i2}+ \dots +w_dx_{id}+b=\omega ^Tx_i+b$
+  > - 均方误差 $E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n (f(x_i)-y_i)^2=\frac{1}{n} \sum\limits _{i=1}^n (\omega ^T x_i+b-y_i)^2$
+  > - 最优参数 $(\omega ^{\*},b^{\*})=\underset{\substack{(\omega, b)}}{\arg\min} E(F;D)=\underset{\substack{(\omega, b)}}{\arg\min} \sum\limits _{i=1}^n (\omega ^T x_i +b-y_i)^2$
+
+> 与一元不同的是上述表达式中的 $x_i,\omega$ 是多维向量，而不是一个单独值
+
+#### 多元线性回归何求解最优参数
+
+- [x] 由于 $E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n (f(x_i)-y_i)^2=\frac{1}{n} \sum\limits _{i=1}^n (\omega ^T x_i+b-y_i)^2$
+
+
+
+### 极大似然法
+## 非线性回归
