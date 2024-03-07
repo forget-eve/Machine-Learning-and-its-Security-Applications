@@ -278,9 +278,9 @@ $$X=\left(\begin{matrix}
 \hat{x_1}^T \newline
 \vdots \newline
 \hat{x_n}^T\end{matrix}\right)=\left(\begin{matrix}
-x_{11} & \cdots & x_{1d} & 1\newline
-\vdots $ \ddots & \vdots $ \vdots\newline
-x_{n1} & \cdots & x_{nd} & 1\end{matrix}\right),y=\left(\begin{matrix}
+x_{11} \ \cdots \ x_{1d} \ 1\newline
+\vdots \ \ddots \ \vdots \ \ \ \ \ \ \ \  \vdots\newline
+x_{n1} \ \cdots \ x_{nd} \ 1\end{matrix}\right),y=\left(\begin{matrix}
 y_1 \newline
 \vdots \newline
 y_n \end{matrix}\right)=(y_1,\dots ,y_n)^T$$
@@ -291,9 +291,9 @@ $$E(F;D)=\frac{1}{n}(y-X\hat{\omega})^T(y-X\hat{\omega})$$
 
 - [x] 优化目标表示为 $\hat{\omega}^{\*}=\underset{\substack{\hat{\omega}}}{\arg\min} (y-X\hat{\omega})^T(y-X\hat{\omega})$
 
-- [x] 求解 $\hat{\omega}^{\*}$ ，需要通过矩阵求导：
+- [x] 求解 $\hat{\omega}^{\*}$ ，需要通过矩阵求导，[常见矩阵求导公式](https://blog.csdn.net/weixin_45816954/article/details/119817108?app_version=6.2.9&code=app_1562916241&csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22119817108%22%2C%22source%22%3A%222301_79807208%22%7D&uLinkId=usr1mkqgl919blen&utm_source=app)：
 
-$$\frac{\partial E(F;D)}{\partial \hat{\omega}}=2X^T(X\hat{\omega}-y)$$
+$$\frac{\partial E(F;D)}{\partial \hat{\omega}}=\frac{2}{n}X^T(X\hat{\omega}-y)$$
 
 - [x] 令上式为0可得到 $\hat{\omega}$ 最优解的闭式解，但涉及矩阵求逆，需分情况讨论
 
@@ -302,7 +302,7 @@ $$\frac{\partial E(F;D)}{\partial \hat{\omega}}=2X^T(X\hat{\omega}-y)$$
 - [x] 当 $X^TX$ 为 [满秩矩阵](https://baike.baidu.com/item/%E6%BB%A1%E7%A7%A9%E7%9F%A9%E9%98%B5) 或 [正定矩阵](https://baike.baidu.com/item/%E6%AD%A3%E5%AE%9A%E7%9F%A9%E9%98%B5)，(此处就是为了保证 $X^TX$ 存在逆矩阵)令上式为0可得
   > - **方阵的满秩，和方阵可逆，和方阵的行列式不等于零，和组成方阵的各个列向量线性无关，和齐次方程组只有零解，这些都是等价的。**
 
-$$2X^T(X \hat{\omega} - y)=0$$
+$$\frac{2}{n}X^T(X \hat{\omega} - y)=0$$
 
 $$\hat{\omega}^{\*}=(X^TX)^{-1}X^Ty$$
 
@@ -315,7 +315,7 @@ $$f(\hat{x_i})=\hat{\omega}^{\*T}\hat{x_i}=\hat{x_i}^T\hat{\omega}^{\*}=\hat{x_i
 - [x] 当 $X^TX$ 为满秩矩阵或正定矩阵，则 $X^TX$ 不存在逆矩阵
   > - 此时可以求出多个 $\hat{\omega}$ ，都能使均方误差最小化，如何处理？
   > - 常见做法是 `正则化(regularization)` 项，使得原式有唯一解
-  > > - 正则项 $E_w=||\hat{\omega}||^2_2$
+  > > - 正则项 $E_w=||\hat{\omega}||^2_2$ ，为2-范数的平方。(向量范数有∞-范数(最大范数) $||X|| _{\infty} =\max\limits _{1 \leq i \leq n}|x_i|$ ，1-范数 $||X||_1=\sum\limits _{i=1}^n|x_i|$ ，2-范数 $||X||_2=(\sum\limits _{i=1}^n|x_i|^2)^{\frac{1}{2}}$ ，p-范数 $||X|| _p=(\sum\limits _{i=1}^n|x_i|^p)^{\frac{1}{p}}$ ,矩阵范数有行和范数 $||A|| _{\infty}=\max\limits _{1 \leq i \leq n} \sum\limits _{j=1}^n |a _{ij}|$ ,列和范数 $||A|| _1=\max\limits _{1 \leq j \leq n} \sum\limits _{i=1}^n |a _{ij}|$ ,谱范数 $||A|| _2=\sqrt{\lambda _{max}(A^TA)}$ )
   > > - 优化目标变为: $E(f;D)=\frac{1}{n}(y-X\hat{\omega})^T(y-X\hat{\omega})+\lambda ||\hat{\omega}||^2_2$
   > > - 最优解变为: $\hat{\omega}^{\*}=(X^TX+ \lambda I)^{-1}X^Ty$
   > > - 通过调整正则项的系数，可以使得 $X^TX+ \lambda I$ 的逆存在，从而原式有唯一解
