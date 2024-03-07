@@ -1,1 +1,26 @@
-# Machine-Learning-and-its-Security-Applications
+# 课前须知
+
+## 考核方式
+
+- [x] 一次作业(单独完成)，看情况布置， ~~~可能不布置~~~ ，提交代码和书面报告
+
+- [x] 一次课程项目(组队完成)，提交代码和书面报告，并进行课堂汇报
+
+<p align="center">
+  <table>
+  <tr>
+    <th>考勤</th>
+    <th>作业</th>
+    <th>课程项目</th>
+    <th>课程汇报</th>
+    <th>总分</th>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>20</td>
+    <td>50</td>
+    <td>20</td>
+    <td>100</td>
+  </tr>
+</table>
+</p> 
