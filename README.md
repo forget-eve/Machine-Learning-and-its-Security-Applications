@@ -204,8 +204,121 @@ b^{\*}=\frac{1}{n} \sum\limits _{i=1}^n (y_i- \omega x_i)\newline
 #### 多元线性回归何求解最优参数
 
 - [x] 由于 $E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n (f(x_i)-y_i)^2=\frac{1}{n} \sum\limits _{i=1}^n (\omega ^T x_i+b-y_i)^2$
+> - 令： $\hat{\omega}=(\omega ^T,b)^T=(w_1,\dots , w_d,b)^T \ \ \ \ \hat{x_i}=(x_i^T,1)^T=(x_{i1},\dots ,x_{id},1)^T$ ，此处也说明 $\omega ,x_i \in R^d$
+> - 有 $E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n (\omega ^T x_i+b-y_i)^2=\frac{1}{n} \sum\limits _{i=1}^n (\hat{\omega} ^T \hat{x_i}-y_i)^2=\frac{1}{n} \sum\limits _{i=1}^n (y_i- \hat{\omega} ^T \hat{x_i})^2$
+> - 令： $E_i=y_i- \hat{\omega} ^T \hat{x_i}$
+> - 有 $E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n (y_i- \hat{\omega} ^T \hat{x_i})^2=\frac{1}{n} \sum\limits _{i=1}^n E_i^2$
+> - 则有
 
+$$E(F;D)=\frac{1}{n} \sum\limits _{i=1}^n E_i^2=\frac{1}{n}(E _1,\dots ,E _n)\left(\begin{matrix}
+E _1 \newline
+\vdots \newline
+E _n\end{matrix}\right)=\frac{1}{n}\left(\begin{matrix}
+E _1 \newline
+\vdots \newline
+E _n\end{matrix}\right)^T\left(\begin{matrix}
+E _1 \newline
+\vdots \newline
+E _n\end{matrix}\right)$$
 
+> - 令 $E_i=y_i- \hat{\omega} ^T \hat{x_i}$
+> - 则有
+
+$$E(F;D)=\frac{1}{n}\left(\begin{matrix}
+y_1- \hat{\omega} ^T \hat{x_1} \newline
+\vdots \newline
+y_n- \hat{\omega} ^T \hat{x_n}\end{matrix}\right)^T\left(\begin{matrix}
+y_1- \hat{\omega} ^T \hat{x_1} \newline
+\vdots \newline
+y_n- \hat{\omega} ^T \hat{x_n}\end{matrix}\right)=\frac{1}{n}\left[\left(\begin{matrix}
+y_1 \newline
+\vdots \newline
+y_n \end{matrix}\right)-\left(\begin{matrix}
+\hat{\omega} ^T \hat{x_1} \newline
+\vdots \newline
+\hat{\omega} ^T \hat{x_n}\end{matrix}\right)\right]^T\left[\left(\begin{matrix}
+y_1 \newline
+\vdots \newline
+y_n \end{matrix}\right)-\left(\begin{matrix}
+\hat{\omega} ^T \hat{x_1} \newline
+\vdots \newline
+\hat{\omega} ^T \hat{x_n}\end{matrix}\right)\right]$$
+
+> **注：此处最后一步是根据行列式性质得到的，这是因为 $\hat{\omega}^T\hat{x_i}$ 和 $y_i$ 无关可以直接拆分**
+
+> - 由于有
+
+$$\left(\begin{matrix}
+\hat{\omega} ^T \hat{x_1} \newline
+\vdots \newline
+\hat{\omega} ^T \hat{x_n}\end{matrix}\right)=(\hat{\omega} ^T\hat{x_1},\dots ,\hat{\omega} ^T\hat{x_n})^T=[\hat{\omega} ^T(\hat{x_1},\dots ,\hat{x_n})]^T=(\hat{x_1},\dots ,\hat{x_n})^T \hat{\omega}=\left(\begin{matrix}
+\hat{x_1}^T \newline
+\vdots \newline
+\hat{x_n}^T\end{matrix}\right)\hat{\omega}$$
+
+> - 则
+
+$$E(F;D)=\frac{1}{n}\left[\left(\begin{matrix}
+y_1 \newline
+\vdots \newline
+y_n \end{matrix}\right)-\left(\begin{matrix}
+\hat{x_1}^T \newline
+\vdots \newline
+\hat{x_n}^T\end{matrix}\right)\hat{\omega}\right]^T\left[\left(\begin{matrix}
+y_1 \newline
+\vdots \newline
+y_n \end{matrix}\right)-\left(\begin{matrix}
+\hat{x_1}^T \newline
+\vdots \newline
+\hat{x_n}^T\end{matrix}\right)\hat{\omega}\right]$$
+
+> - 不妨令
+
+$$X=\left(\begin{matrix}
+\hat{x_1}^T \newline
+\vdots \newline
+\hat{x_n}^T\end{matrix}\right)=\left(\begin{matrix}
+x_{11} & \cdots & x_{1d} & 1\newline
+\vdots $ \ddots & \vdots $ \vdots\newline
+x_{n1} & \cdots & x_{nd} & 1\end{matrix}\right),y=\left(\begin{matrix}
+y_1 \newline
+\vdots \newline
+y_n \end{matrix}\right)=(y_1,\dots ,y_n)^T$$
+
+> - 则有
+
+$$E(F;D)=\frac{1}{n}(y-X\hat{\omega})^T(y-X\hat{\omega})$$
+
+- [x] 优化目标表示为 $\hat{\omega}^{\*}=\underset{\substack{\hat{\omega}}}{\arg\min} (y-X\hat{\omega})^T(y-X\hat{\omega})$
+
+- [x] 求解 $\hat{\omega}^{\*}$ ，需要通过矩阵求导：
+
+$$\frac{\partial E(F;D)}{\partial \hat{\omega}}=2X^T(X\hat{\omega}-y)$$
+
+- [x] 令上式为0可得到 $\hat{\omega}$ 最优解的闭式解，但涉及矩阵求逆，需分情况讨论
+
+###### 求解情形一
+
+- [x] 当 $X^TX$ 为 [满秩矩阵](https://baike.baidu.com/item/%E6%BB%A1%E7%A7%A9%E7%9F%A9%E9%98%B5) 或 [正定矩阵](https://baike.baidu.com/item/%E6%AD%A3%E5%AE%9A%E7%9F%A9%E9%98%B5)，(此处就是为了保证 $X^TX$ 存在逆矩阵)令上式为0可得
+  > - **方阵的满秩，和方阵可逆，和方阵的行列式不等于零，和组成方阵的各个列向量线性无关，和齐次方程组只有零解，这些都是等价的。**
+
+$$2X^T(X \hat{\omega} - y)=0$$
+
+$$\hat{\omega}^{\*}=(X^TX)^{-1}X^Ty$$
+
+> 最终得到的多元线性回归模型为：
+
+$$f(\hat{x_i})=\hat{\omega}^{\*T}\hat{x_i}=\hat{x_i}^T\hat{\omega}^{\*}=\hat{x_i}^T (X^TX)^{-1}X^Ty$$
+
+##### 求解情形二
+
+- [x] 当 $X^TX$ 为满秩矩阵或正定矩阵，则 $X^TX$ 不存在逆矩阵
+  > - 此时可以求出多个 $\hat{\omega}$ ，都能使均方误差最小化，如何处理？
+  > - 常见做法是 `正则化(regularization)` 项，使得原式有唯一解
+  > > - 正则项 $E_w=||\hat{\omega}||^2_2$
+  > > - 优化目标变为: $E(f;D)=\frac{1}{n}(y-X\hat{\omega})^T(y-X\hat{\omega})+\lambda ||\hat{\omega}||^2_2$
+  > > - 最优解变为: $\hat{\omega}^{\*}=(X^TX+ \lambda I)^{-1}X^Ty$
+  > > - 通过调整正则项的系数，可以使得 $X^TX+ \lambda I$ 的逆存在，从而原式有唯一解
 
 ### 极大似然法
 ## 非线性回归
