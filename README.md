@@ -1067,7 +1067,7 @@ $$P(c_k|a_i)=\frac{P(c_k)P(a_i|c_k)}{P(a_i)}$$
 
 $$P(a_i|c_k)=\prod\limits_{j=1}^d P(a_{i_j}|c_k)$$
 
-> - 由此可将贝叶斯公式改写为 $P(c_k|a_i)=\frac{P(c_k)P(a_i|c_k)}{P(a_i)}=\frac{P(c_k)\prod\limits_{j=1}^d P(a_{i_j}|c_k)}{P(a_i)}$$
+> - 由此可将贝叶斯公式改写为 $P(c_k|a_i)=\frac{P(c_k)P(a_i|c_k)}{P(a_i)}=\frac{P(c_k)\prod\limits_{j=1}^d P(a_{i_j}|c_k)}{P(a_i)}$
 
 - [x] 类别先验概率估计
 
@@ -1077,7 +1077,7 @@ $$P(c_k)=\frac{|D_{c_k}|}{|D|},D_{c_x}表示训练集D中第c_k类样本组成�
 
 > - 离散特征
 
-$$P(a_{i_j}|c_k)=\frac{|D_{c_k,a_{i_j}}|}{|D_{c_k}|},D_{c_k,a_{i_j}表示D_{c_k}中在第j个特征上取值为a{i_j}的样本组成的集合$$
+$$P(a_{i_j}|c_k)=\frac{|D_{c_k,a_{i_j}}|}{|D_{c_k}|},D_{c_k,a_{i_j}}表示D_{c_k}中在第j个特征上取值为a{i_j}的样本组成的集合$$
 
 > - 连续特征(假设服从正态分布， $\mu_{c_k}$ 为特征 $c_k$ 均值 $\sigma_{c_k}$ 为特征 $c_k$ 密度方差)
 
