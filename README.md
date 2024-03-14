@@ -1347,8 +1347,136 @@ $$\hat{P}_{清脆|好瓜}=\hat{P}(敲声=清脆|好瓜)=\frac{0+1}{8+3} \approx 
 
 - [x] 特征向量与标签
   > - 若样本 $x_i$ 包含 $d$ 个属性(特征)， $x_i$ 的特征向量表示为： $x_i=(x_{i_1},\dots ,x_{i_j},\dots ,x_{i_d})^T$
-  > - 样本 $x_i$ 的分类标签记为 $y_i$ ， $y_ \in \lbrace +1,-1\lbrace$ ，比如 $+1$ 对应好瓜， $-1$ 对应坏瓜。
+  > - 样本 $x_i$ 的分类标签记为 $y_i$ ， $y_ \in \lbrace +1,-1\rbrace$ ，比如 $+1$ 对应好瓜， $-1$ 对应坏瓜。
   > - 数据集 $T=\lbrace (x_1,y_1),\dots ,(x_i,y_i),\dots ,(x_n,y_n)\rbrace$ ， $n$ 为样本个数。
+
+- [x] 特征空间与输出空间
+  > - 由样本特征向量 $x_i=(x_{i_1},\dots ,x_{i_j},\dots ,x_{i_d})^T$ 张成的空间称为“特征空间”或“输入空间”。
+  > - 所有 $y_i$ 的集合称为“输出空间”， $\lbrace +1,-1\rbrace$ 。
+
+> 二维特征空间示例
+
+<p align="center">
+  <img src="./img/二维特征空间示例.jpg" alt="二维特征空间示例">
+  <p align="center">
+   <span>二维特征空间示例</span>
+  </p>
+</p>
+
+#### 感知机及其原理
+
+- [x] **感知机：在特征空间寻找超平面进行线性划分**
+  > - 感知机是一种线性分类模型，通过寻找超平面对数据进行线性划分
+  > - 在如图所示二维情况下，感知机模型可以找到能够正确划分数据类别 $\lbrace +1,-1\rbrace$ 的直线
+  > - 高维情况下，感知机将尝试找到合适的超平面，将数据正确划分
+
+$$超平面方程：\omega ^Tx+b=0$$
+
+> - 此处 $\omega$ 和 $x$ 均为向量
+
+<p align="center">
+  <img src="./img/感知机二维情况.jpg" alt="感知机二维情况">
+  <p align="center">
+   <span>感知机二维情况</span>
+  </p>
+</p>
+
+#### 感知机模型
+
+- [x] 感知机的处理流程
+  > - 输入是样本的特征向量 $x_i=(x_{i_1},\dots ,x_{i_j},\dots ,x_{i_d})^T$
+  > - 感知机先对样本的每个属性进行线性组合： $\sum\limits_{j=1}^d \omega _j x _{i_j}+b$
+  > - 再将线性组合得到的值，用符号函数 $sign(·)$ 进行分类映射，输出分类结果 $\hat{y_i}$ 。即
+
+$$\hat{y_i}=sign(\sum\limits_{j=1}^d \omega _j x _{i_j}+b)$$
+
+<p align="center">
+  <img src="./img/感知机的处理流程.jpg" alt="感知机的处理流程">
+  <p align="center">
+   <span>感知机的处理流程</span>
+  </p>
+</p>
+
+- [x]  `权重` ，也就是对于样本的特征向量 $x_i$ 的每个分量 $x_{i_j}$ 的加权，对于不同样本的相同方向 $j$ 上的分量的权重 $\omega _j$ 是一致的。
+
+- [x]  `阈值` ，也就是上述输出结果中的 $b$ 。
+  > -  `权重` 确定了分类超平面的 `方向` , `阈值` 确定了分类超平面的 `位置` 。
+  > - 特征空间为二维时，`权重`与 `阈值` 分别也就是类似 `频率` 和 `截距` 。比如超平面为 $x_{i_1}+x_{i_2}-3=0$ ，那么 <kbd>-3</kbd> 为阈值， <kbd>1</kbd>为 $x_{i_1}$ 和 $x_{i_2}$ 的权重
+
+- [x]  `符号函数sign()`
+  > - 权重与阈值确定了超平面，符号函数则完成分类的功能：将输入属性的线性组合 $z$ 映射到输出空间 $\lbrace +1,-1\rbrace$ 。
+
+> - 观察一下符号函数
+
+$$sign(x)=\begin{cases}
++1 , x \geq 0 \newline
+-1 , x \leq 0
+\end{cases}$$
+
+> - 那么对比输出 $\hat{y_i}=sign(\sum\limits_{j=1}^d \omega _j x _{i_j}+b)$ ，可知符号函数的作用就是首先判断出样本在超平面的哪一边(一个平面显然是可以将空间分成两个部分的，所以 $超平面 \leq 0$ 时，就在超平面上方部分包括超平面，归入类别 $+1$ ，反之则在超平面下方，归入类别 $-1$ )
+
+#### 感知机如何从数据中学习？
+
+- [x] 感知机的目标是寻找一个分类超平面,已知权重与阈值确定了超平面，因此需要学习的参数包括：权重 $\omega$ 和阈值 $b$ 。
+
+- [x] 首先随机初始化参数权重 $\omega$ 和阈值 $b$。如图参数随机初始化得到的分类超平面大概率不能正确分类，需要学习。
+
+<p align="center">
+  <img src="./img/感知机如何从数据中学习.jpg" alt="感知机如何从数据中学习">
+  <p align="center">
+   <span>参数随机初始化得到的分类超平面</span>
+  </p>
+</p>
+
+- [x] 然后用 `误分类驱动` 的 `梯度下降学习` 算法（后面详讲）进行参数学习。
+
+- [x] 误分类数据
+  > - 感知机的数学模型:
+
+$$\hat{y_i}=sign(\sum\limits_{j=1}^d w _j x _{i_j}+b)=sign(\omega ^Tx_i+b),\omega = (w_1,w_2,\dots ,w_d)^T$$
+
+> - 假设数据 $x_i$ 被误分类，则误分类数据 $x_i$ 应满足： $y_i ×(\omega ^Tx_i+b)<0$ ，即 $y_i≠ \hat{y_i}$ , $y_i$ 与 $\omega ^Tx_i+b$ 的符号相反。
+
+<p align="center">
+  <img src="./img/误分类数据.jpg" alt="误分类数据">
+  <p align="center">
+   <span>误分类数据</span>
+  </p>
+</p>
+
+- [x] 损失函数
+  > - 定义损失函数：
+
+$$L(\omega,b)=-\sum\limits_{x_i \in M} y_i ×(\omega ^Tx_i+b),M是误分类数据的集合$$
+
+> - 损失函数的意义：由于误分类数据有 $-y_i ×(\omega ^Tx_i+b)>0$ ，所以损失函数总是大于 $0$ 的。学习的目标是最小化损失函数至 $0$ ，此时 $M$ 为空,意味着没有误分类数据，所有样本均正确分类。
+
+- [x] 优化目标
+
+$$\min\limits_{\omega,b} L(\omega,b)=\min\limits_{\omega,b} -\sum\limits_{x_i \in M} y_i ×(\omega ^Tx_i+b)$$
+
+> - 令 $\hat{\omega}=(\omega^T,b)^T=(w_1,w_2,\dots ,w_d,b)^T，\hat{x_i}=(x_i^T,1)^T=(x_{i_1},\dots ,x_{i_j},\dots ,x_{i_d},1)^T$ ，则优化目标可以进一步写成：
+
+$$\min\limits_{\hat{\omega}} L(\hat{\omega})=\min\limits_{\hat{\omega}} -\sum\limits_{x_i \in M} y_i ×(\hat{\omega}^T \hat{x_i})$$
+
+> - 这里采用 `梯度下降法` 进行优化。
+
+- [x] 梯度下降法
+  > - 假设有一个函数 $f(x)$ ，导数 $f'(x)$ 代表 $f(x)$ 在点 $x$ 处的斜率。
+  > - 根据泰勒公式有： $f(x+ \epsilon )≈f(x)+\epsilon f(x)$ ， $\epsilon$ 称为 `步长`
+  > - 所以可以将 $x$ 往导数的反方向移动一小步 $\epsilon$ 来减小 $f(x)$ ，这种技术称为 `梯度下降` 。
+
+<p align="center">
+  <img src="./img/梯度下降法.jpg" alt="梯度下降法">
+</p>
+
+> - 当输入 $x4 是向量时， $f(x)$ 的梯度记为 $\nabla _x f(x)=(\frac{\partial f}{\partial x_1},\frac{\partial f}{\partial x_2},\dots ,\frac{\partial f}{\partial x_d})^T$
+
+> - 由梯度的数学定义可知：梯度的反方向是使 $f$ 下降最快的方向，所以在梯度下降法中，一般沿着梯度的反方向更新自变量：
+
+$$x'\leftarrow x-\rho \nabla_x f(x)$$
+
+$$\rho \in (0,1)为学习率，是一个确定步长大小的标量$$
 
 #### 感知机的局限性
 
