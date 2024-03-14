@@ -1478,6 +1478,120 @@ $$x'\leftarrow x-\rho \nabla_x f(x)$$
 
 $$\rho \in (0,1)为学习率，是一个确定步长大小的标量$$
 
+> - 优化目标
+
+$$\min\limits_{\hat{\omega}} L(\hat{\omega})=\min\limits_{\hat{\omega}} -\sum\limits_{x_i \in M} y_i ×(\hat{\omega}^T \hat{x_i})$$
+
+> - 使用梯度下降法进行优化，求梯度：
+
+$$\nabla_{\hat{\omega}}L(\hat{\omega})=-\sum\limits_{x_i \in M} y_i \hat{x_i}$$
+
+> - 遍历选取误分类数据： $\hat{x_i} \in M$ ，沿着梯度反方向更新参数：
+
+$$\hat{\omega} \leftarrow \hat{\omega}+\rho y_i \hat{x_i}$$
+
+> - 通过迭代误分类数据，可以期待损失函数不断减小，直到为0
+
+- [x] 感知机学习规则
+  > - 梯度下降法得到的参数更新规则：
+
+$$\hat{\omega} = \hat{\omega}+\rho y_i \hat{x_i},for \hat{x_i} \in M$$
+
+> - 令 $\hat{\omega}=(\omega^T,b)^T=(w_1,w_2,\dots ,w_d,b)^T，\hat{x_i}=(x_i^T,1)^T=(x_{i_1},\dots ,x_{i_j},\dots ,x_{i_d},1)^T$ ，则有
+
+$$w_j=w_j+\rho y_i x_{x_j},for \hat{x_i} \in M$$
+
+> - $y_i ,\hat{y_i} \in \lbrace +1,-1\rbrace$ ，推出一般参考书常见的感知机学习规则
+
+$$w_j \leftarrow w_j + \Delta w_j$$
+
+$$\Delta w_j = \rho (y_i - \hat{y_i})x_{i_j}$$
+
+> - 这里的 $x_{i_j}$ 不要求是误分类数据的属性，因为正确分类的数据有 $y_i=\hat{y_i},\Delta w_j=0$ ，参数不更新
+
+- [x] 感知机学习算法
+
+> - 输入：数据集 $T=\lbrace (x_1,y_1),\dots ,(x_i,y_i),\dots ,(x_n,y_n)\rbrace$ ， $n$ 为样本个数，学习率 $\rho$ 。
+> - 输出： $w_j,j=1,2,\dots ,d+1;b=w_{d+1}$ ，感知机模型 $\hat{y_i}=sign(\sum\limits_{j=1}^d w_j x _{i_j}+b)$ 。
+> - 损失函数: $L(\hat{\omega})= -\sum\limits_{x_i \in M} y_i ×(\hat{\omega}^T \hat{x_i})$
+> - (1) 随机初始化 $w_j$ ;
+> - (2) 在训练集中选取数据 $(x_i,y_i)$ ;
+> - (3)
+
+$$w_j \leftarrow w_j + \Delta w_j$$
+
+$$\Delta w_j = \rho (y_i - \hat{y_i})x_{i_j}$$
+
+> - (4) 转至(2)，直到所有数据被正确分类
+
+#### 感知机的参数学习示例
+
+$$w_j \leftarrow w_j + \Delta w_j$$
+
+$$\Delta w_j = \rho (y_i - \hat{y_i})x_{i_j}$$
+
+> - 训练数据如下所示
+
+<p align="center">
+  <img src="./img/感知机的训练集.png" alt="感知机的训练集">
+  <p align="center">
+   <span>感知机的训练集</span>
+  </p>
+</p>
+
+- [x] ①感知机权重初始化：
+  > - 随机初始化参数 $w_1=2,w_2=\frac{2}{3},b=-1,\hat{y_i}=sign(2x _{i_1}+ \frac{2}{3} x _{i_2}-1)$
+
+<p align="center">
+  <img src="./img/初始超平面.jpg" alt="初始超平面">
+  <p align="center">
+   <span>初始超平面</span>
+  </p>
+</p>
+
+- [x] ②输入 $(0,0)$ ，输出 $-1$ ;输入 $(0,1)$ ，输出 $-1$ ;输入 $(1,1)$ ，输出 $+1$ ;
+  > - 输出正确，权重不发生改变。
+
+- [x] 输入 $(1,0)$ ，输出 $\hat{y_i}=+1,y_i=-1$ ，输出错误，更新权重:
+  > - 学习率 $\rho$ 取 $\frac{1}{3}$
+
+$$w_1 \leftarrow w_1 + \Delta w_1,w_2 \leftarrow w_2 + \Delta w_2$$
+
+$$\Delta w_1 =\frac{1}{3} (-1 - 1)1,\Delta w_2 =\frac{1}{3} (-1 - 1)0$$
+
+$$w_1 = 2 - \frac{2}{3} =\frac{4}{3},w_1 =\frac{2}{3} +0=\frac{2}{3}$$
+
+$$\hat{y_i}=sign(\frac{4}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
+
+<p align="center">
+  <img src="./img/第二次超平面.jpg" alt="第二次超平面">
+  <p align="center">
+   <span>第二个超平面</span>
+  </p>
+</p>
+
+- [x] ④输入 $(0,0)$ ，输出 $-1$ ;输入 $(0,1)$ ，输出 $-1$ ;输入 $(1,1)$ ，输出 $+1$ ;
+  > - 输出正确，权重不发生改变。
+
+- [x] ⑤输入 $(1,0)$ ，输出 $\hat{y_i}=+1,y_i=-1$ ，输出错误，更新权重:
+
+$$w_1 \leftarrow w_1 + \Delta w_1,w_2 \leftarrow w_2 + \Delta w_2$$
+
+$$\Delta w_1 =\frac{1}{3} (-1 - 1)1,\Delta w_2 =\frac{1}{3} (-1 - 1)0$$
+
+$$w_1 = \frac{4}{3} - \frac{2}{3} =\frac{2}{3},w_1 =\frac{2}{3} +0=\frac{2}{3}$$
+
+$$\hat{y_i}=sign(\frac{2}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
+
+<p align="center">
+  <img src="./img/第三次超平面.jpg" alt="第三个超平面">
+  <p align="center">
+   <span>第三个超平面</span>
+  </p>
+</p>
+
+- [x] ⑥超平面将所有样本正确分类，学习收敛，训练结束。
+
 #### 感知机的局限性
 
 > - 单层感知机只能对线性可分的数据进行分类。
