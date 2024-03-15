@@ -1707,10 +1707,10 @@ $$\hat{y_i}=sign(\frac{2}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
 
 - [x] 超平面 $H_1$ 和 $H_2$ 之间的距离即为 `间隔`
 
-- [x] 样本到划分超平面的距离： $r=\frac{y_i(\omega ^Tx_i+b})}{||\omega||_2}$
-  > - 范数 $||\vec{x}||_2$ 是表示 $\vec{x}$ 的模长，上面的向量 $x$ 或其他变量没有写成 $\vec{x}$ 或 $\mathbf{x}$ 的形式是便于观看，请注意辨别。下面将 $||\omega||_2$ 省略为 $||\omega||$ 一般向量的模数不写下标默认为2-模数，而其实上可以直接将点到超平面距离写为 $r=\frac{|\omega ^Tx_i+b}|}{||\omega||_2}$ ，但是由于 $y_i$ 的取值为 $+1$ 或 $-1$ ，而其与 $x_i$ 在超平面哪个位置有关，很显然 $\omega ^Tx_i+b \geq 0$ 时 $y_i$ ，此时 $|\omega ^Tx_i+b}|=y_i(\omega ^Tx_i+b})$ 另种情况一致。
+- [x] 样本到划分超平面的距离： $r=\frac{y_i(\omega ^Tx_i+b)}{||\omega||_2}$
+  > - 范数 $||\vec{x}||_2$ 是表示 $\vec{x}$ 的模长，上面的向量 $x$ 或其他变量没有写成 $\vec{x}$ 或 $\mathbf{x}$ 的形式是便于观看，请注意辨别。下面将 $||\omega||_2$ 省略为 $||\omega||$ 一般向量的模数不写下标默认为2-模数，而其实上可以直接将点到超平面距离写为 $r=\frac{|\omega ^Tx_i+b|}{||\omega||_2}$ ，但是由于 $y_i$ 的取值为 $+1$ 或 $-1$ ，而其与 $x_i$ 在超平面哪个位置有关，很显然 $\omega ^Tx_i+b \geq 0$ 时 $y_i$ ，此时 $|\omega ^Tx_i+b|=y_i(\omega ^Tx_i+b)$ 另种情况一致。
 
-- [x] 样本集到划分超平面的距离： $\rho = \min\limits_(x_i,y_i) \frac{y_i(\omega ^Tx_i+b})}{||\omega||}=\frac{a}{||\omega||}$
+- [x] 样本集到划分超平面的距离： $\rho = \min\limits_(x_i,y_i) \frac{y_i(\omega ^Tx_i+b)}{||\omega||}=\frac{a}{||\omega||}$
 
 - [x] 优化目标： `最大化` 样本集到划分超平面的距离，即:
 
