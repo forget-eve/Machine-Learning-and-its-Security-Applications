@@ -1678,7 +1678,7 @@ $$\hat{y_i}=sign(\frac{2}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
   > - 线性可分支持向量机：针对完全线性可分问题，优化目标实现“硬间隔”最大化
   > - 线性支持向量机：针对非完全线性可分问题，优化目标实现“软间隔”最大化
 
-<p align="center">
+<p align="center" id="distance1">
   <img src="./img/硬间隔和软间隔.jpg" alt="硬间隔和软间隔">
 </p>
 
@@ -1696,8 +1696,9 @@ $$\hat{y_i}=sign(\frac{2}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
   </p>
 </p>
 
+#### 线性可分支持向量机————硬间隔
 
-#### 间隔
+##### 间隔
 
 - [x] 若 $H=\lbrace x:\omega^Tx+b= \epsilon \rbrace$ 可以分离样本空间，这个是可以通过感知机的方法得到这个超平面的：
   > - 将 $H$ 向两个方向平移至首次与两个类别的样本点相交，得到两个超平面 $H_1$ ，和 $H_2$ ，即为 `支撑超平面` ，支撑超平面上的样本点被称为 `支持向量` 。也就是把感知机得到的超平面向两类数据的方向分别平移，直到两个类别的样本点有点出现在平移后的超平面上上，而此时超平面就被称为支撑超平面。
@@ -1727,7 +1728,7 @@ $$\lambda = \max\limits_{\omega,b}\frac{2}{||\omega '||} \ s.t. \ y_i(\omega '^T
 
 > 上面的 <span id="yueshutiaojian1">约束条件</span> 也可以写为 $y_i(\omega '^T x_i+b') -1 \geq 0,\forall i$
 
-##### 示例
+###### 示例
 
 - [x] 假设超平面 $(\omega,b)$ 能使样本正确分类，需满足:
 
@@ -1752,7 +1753,7 @@ $$\omega^Tx_i+b \geq 1$$
   </p>
 </p>
 
-##### 间隔最大化
+###### 间隔最大化
 
 - [x] 线性 `SVM` 的优化训练，等价于找到“最大间隔”的划分超平面,即找到参数 $\omega$ 和 $b$ ，使得 $\lambda$ 最大
 
@@ -1766,7 +1767,7 @@ $$s.t. \ y_i(\omega ^T· x_i+b)-1≥0, i=1,2,…,N$$
 
 - [x] 为便于计算，使用拉格朗日乘子法将“间隔最大化”的 `原始问题转换为对偶问题`
 
-##### 数学原理的推导与证明： $原始问题$
+###### 数学原理的推导与证明： $原始问题$
 
 - [x] 假设存在一个 `原始问题` ，问题形如:
 
@@ -1798,7 +1799,7 @@ f(x) , & x \text{满足原始问题约束且} α_i≥0 \newline
 
 > - 因此得证： $\min\limits _{x} f(x) = \min\limits _{x} \theta _p(x)=\min\limits _{x} \max\limits _{α,β:α_i \geq 0} L(x,α,β)$
 
-##### 数学原理的推导与证明： $对偶问题$
+###### 数学原理的推导与证明： $对偶问题$
 
 - [x] 针对 `原始问题` ：
 
@@ -1812,7 +1813,7 @@ $$\max\limits _{α,β:α _i \geq 0} \theta _{D}(α,β) = \max\limits _{α,β:α 
 
 - [x] 当且仅当 [`KKT条件`](#/?id=KKT) 满足时， ***原始问题与对偶问题的最优值相等*** 。
 
-##### 数学原理的推导与证明： $KKT条件$
+###### 数学原理的推导与证明： $KKT条件$
 
 - [x] 存在 $L(x^{\*},α^{\*},β^{\*})$ ，其中 $x^{\*},a^{\*}$ 和 $β^{\*}$ 同时为 `原始问题和对偶问题` 的 `最优解` 的 `充分必要条件` 是 $x^{\*},a^{\*}$ 和 $β^{\*}$ <span id="KKT">满足</span> `KKT条件` ：
 
@@ -1832,7 +1833,7 @@ $$h(x^{\*})= 0 ,j=1,2,\dots , l (原始约束条件)$$
 
 > - 关于证明该为充要条件， [`请点击此处`](https://blog.csdn.net/gaofeipaopaotang/article/details/108058871)
 
-##### 支持向量机的对偶问题求解
+###### 支持向量机的对偶问题求解
 
 - [x] 回顾原始问题:
 
@@ -1868,19 +1869,281 @@ $$(6) \ α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \ (引入α_i^{\*}的约束条件)$$
 > - 步骤二：将参数 $\omega,b$ 用 $α$ 表示，得到 `对偶问题格式` ：
 > > - 首先根据 `KKT条件` (1),(2),(6)求解([`矩阵求导公式`](https://blog.csdn.net/weixin_45816954/article/details/119817108?app_version=6.2.9&code=app_1562916241&csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22119817108%22%2C%22source%22%3A%222301_79807208%22%7D&uLinkId=usr1mkqgl919blen&utm_source=app))：
 
-$$(1) \ \nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow - \sum\limits _{i=1}^N a _i y _i \omega x _i = 0 \rightarrow \omega = \sum\limits _{i=1}^N a _i y _i x _i$$
+$$(1) \ \nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow \omega·I - \sum\limits _{i=1}^N α _i y _i ·I x _i = 0 \rightarrow \omega = \sum\limits _{i=1}^N α _i y _i x _i$$
 
-$$(2) \ \nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow - \sum\limits _{i=1}^N a _i y _i = 0 \rightarrow \sum\limits _{i=1}^N a _i y _i = 0$$
+$$(2) \ \nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow - \sum\limits _{i=1}^N α _i y _i = 0 \rightarrow \sum\limits _{i=1}^N α _i y _i = 0$$
 
 $$(6) \ α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \rightarrow 保留$$
 
 > > - 将上述(1)(2)结果关系式代入，得到对偶问题:
 
-$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j)+ \sum\limits _{i=1}^N α_i$$
+$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$$
 
-$$s.t.$$
+$$s.t. \ \sum\limits _{i=1}^N α _i y _i = 0 ; \ α_i ≥ 0 \ ,i=1,2\dots , N$$
 
-#### 线性支持向量机
-##### 硬间隔
+> > > - 推导过程: $L(\omega,b,α)=\frac{1}{2} ||\omega||^2-\sum\limits _{i=1}^N α _i·y _i(\omega ^T· x _i+b)+\sum\limits _{i=1}^N α _i = \frac{1}{2} \omega · \omega ^T -\sum\limits _{i=1}^N α _i·y _i(\omega ^T· x _i+b)+\sum\limits _{i=1}^N α _i$ ，带入 $\omega = \sum\limits _{i=1}^N α _i y _i x _i$ ，有( $\omega ^T=\sum\limits _{i=1}^N α _i y _i x _i^T$ 因为在此处只有 $x_i$ 为向量 $x _i=(x _{i _1},\dots ,x _{i _j},\dots ,x _{i _d})^T$ )
+> > > - $L(b,α)=\sum\limits _{i=1}^N α _i y _i x _i · \sum\limits _{j=1}^N α _j y _j x _j^T -\sum\limits _{i=1}^N α _i·y _i \sum\limits _{j=1}^N α _j y _j x _j^T· x _i-\sum\limits _{i=1}^N α _i·y _i · b +\sum\limits _{i=1}^N α _i$
+> > > - 带入 $\sum\limits _{i=1}^N α _i y _i = 0$ 则有 $L(α)=- \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$
+
+> - 步骤三：将对偶问题的解 $α^{\*}$ ，推及得到原始问题的解 $\omega^{\*}，b^{\*}$ ，获得最终结果
+> > - 在求得对偶问题的解 $α^{\*}$ 的情况下，结合其他条件，可推及得到原始问题对 $\omega，b$ 的解 $\omega^{\*}，b^{\*}$ :
+
+$$\omega^{\*} = \sum\limits _{i=1}^N α^{\*}_i y _i x _i , \ b^{\*}=\frac{1}{N} \sum\limits _{j=1}^N \left( y _j + \sum\limits _{i=1}^N α^{\*}_i y _i x _i·x _j^T\right)$$
+
+> > > - $b^{\*}$ 的确定步骤，由于对于任意 `支持向量` $(x_i,y_i)$ 都有 $y_i (\omega^T x_i +b)=1$ ( [`约束条件决定`](#/?id=rule1) )，即有 $y_i \left( \sum\limits _{j=1}^N α^{\*}_j y _j x _j^T x _i+b\right)=1$ 。
+> > > - 理论上，可以选择任意支持向量并通过上述式子求解得到 $b$ ，但实际上通常采用一种 `更鲁棒` 的做法，也就是使用所有支向量求解的平均值 $\frac{1}{N} \sum\limits _{j=1}^N \left( y _j + \sum\limits _{i=1}^N α^{\*}_i y _i x _i·x _j^T\right)$ 
+
+> > - 得到最终 `划分超平面` 的函数表达：
+
+$$f(x)=sign \left(\sum\limits_{i=1}^N (α^{\*}_i y _i x _i^T)·x+b^{\*} \right)$$
+
+> 注：上述过程仍然需要满足 `KKT条件` ，即满足
+
+$$\begin{cases}
+α_i \geq 0 \newline
+1 - y_i (\omega^T x_i +b) \leq 0 \newline
+α_i·[1 - y_i (\omega^T x_i +b)]=0\newline
+\end{cases}$$
+
+> 所以有对于任意训练样本 $(x_i,y_i)$ ，总有 $α_i=0$ 或 $y_i (\omega^T x_i +b) = 1$ 。若 $α_i=0$ ，那么该样本将不会在上面最终得到的 `划分超平面` 的函数表达式求和中出现，也就不会对 $f(x)$ 有任何影响；若 $α_i > 0$ ，那么必然有 $y_i (\omega^T x_i +b) = 1$ 。其所对应的样本点位于 <span id="rule1">最大间隔的边界</span> 上，是一个 `支持向量` 。这也显示出支持向量机的重要性质： **训练完成后，大部分的训练样本都不需要保留，最终模型仅与 `支持向量` 有关。**
+
+###### 对偶问题参数 $\alpha$ 的求解算法————SMO
+
+- [x]  `SMO(Swquential Minimal Optimization)` 适用于求解 `二次规划问题` ，而上面的 `对偶问题` 也正好是 [`二次规划问题`](https://zh.wikipedia.org/wiki/%E4%BA%8C%E6%AC%A1%E8%A7%84%E5%88%92) 。
+
+- [x]  `SMO` 的基本思路是先固定 $α_i$ 之外的所有参数，然后求 $α_i$ 上的极值，由于存在约束需 $\sum\limits_{i=1}^N α_i·y_i=0$ ，若固定 $α_i$ 之外的其他变量，则 $α_i$ 可由其他变量导出。于是， `SMO` 每次选择两个变量 $α_i$ 和 $α_j$ ，并固定其他参数，这样，在参数初始化后， `SMO` 不断执行如下两个步骤直至收敛：
+  > - 选取一对需更新的变量 $α_i$ 和 $α_j$
+  > - 固定 $α_i$ 和 $α_j$ 以外的参数，求解上面式子 $\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$ 获得更新后的 $α_i$ 和 $α_j$ 。
+
+- [x] 注意到只需选取的 $α_i$ 和 $α_j$ 中有一个不满足 `KKT条件` $\sum\limits _{i=1}^N α _i y _i = 0 ; \ α_i^{\*} ≥ 0 \ ,i=1,2\dots , k$ ，目标函数就会在迭代后减小.直观来看， `KKT条件` 违背的程度越大，则变量更新后可能导致的目标函数值减幅越大.于是， `SMO` 先选取违背 `KKT条件` 程度最大的变量，第二个变量应选择一个使目标函数值减小最快的变量，但由于比较各变量所对应的目标函数值减幅的复杂度过高，因此 `SMO` 采用了一个启发式：使选取的两变量所对应样本之间的间隔最大，一种直观的解释是，这样的两个变量有很大的差别，与对两个相似的变量进行更新相比，对它们进行更新会带给目标函数值更大的变化。
+
+- [x]  `SMO` 算法之所以高效，恰由于在固定共他参数后，仅优化两个参数的过程能做到非常高效，具体来说，仅考虑 $α_i$ 和 $α_j$ 时，式 $\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$ 中的约束可重写为
+
+$$α_iy_i+α_jy_j=c,α_i \geq 0, \ α_j \geq 0$$
+
+- [x] 其中
+
+$$c=- \sum\limits^N_{k \not = i,j}α_ky_k$$
+
+> - 是使 $\sum\limits^N_{i=0} α_iy_i=0$ 成立的常数.用
+
+$$α_iy_i+α_jy_j=c$$
+
+- [x] 消去式 $\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$ 中的变量 $α_j$ ，则得到一个关于 $α_i$ 的单变量二次规划问题，仅有的约束是 $α_i ≥ 0$ .不难发现，这样的二次规划问题具有闭式解，于是不必调用数值优化算法即可高效地计算出更新后的 $α_i$ 和 $α_j$ 。
+
+#### 线性支持向量机————软间隔
+
 ##### 软间隔
-#### 非线性支持向量机
+
+- [x] 允许某些样本不满足线性分割约束，区别于前面介绍的要求所有样本满足线性分割约束的“ `硬间隔` ”，线性支持向量机即基于“ `软间隔` ”最大化实现的支持向量机。(详见上述 <kbd><a href="#/?id=distance1">软硬间隔的区别</a></kbd> )
+
+###### 软间隔最大化
+
+- [x] 基于软间隔，存在部分样本点不再满足 `函数间隔大于等于1` 的约束条件。
+  > - 为此，对每个样本点 $(x_i,y_i)$ 引入松弛变量 $\xi _i≥0$ ，约束条件变为:
+
+$$y_i(\omega^T·x_i+b)≥1- \xi$$
+
+- [x] 基于软间隔最大化的优化目标为：
+
+$$\min\limits_{\omega,b,\xi_i} \frac{1}{2} ||\omega||^2+C \sum\limits_{i=i}^N \xi _i$$
+
+$$s.t. \ y_i(\omega ^T· x_i+b)≥1- \xi _i, i=1,2,\dots ,N$$
+
+$$\xi _i \geq 0 , i=1,2,\dots ,N$$
+
+> $C$ 为惩罚参数，表示对 `误分类` 的 `惩罚程度`
+
+###### 对偶问题
+
+- [x] 转换为对偶问题：
+
+$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$$
+
+$$s.t. \ \sum\limits _{i=1}^N α _i y _i = 0 ; \ 0 \leq α_i \leq C \ ,i=1,2\dots , N$$
+
+- [x] 转换为对偶问题的求解过程
+
+$$L(\omega,b,\xi,α,\mu) \equiv \frac{1}{2} ||\omega||^2+C \sum\limits_{i=i}^N \xi _i - \sum\limits _{i=1}^N α_i·[y _i(\omega ^T· x_i+b)-1+\xi _i] - \sum\limits _{i=1}^N \mu _i \xi _i$$
+
+$$\nabla_{\omega}L(\omega,b,\xi,α,\mu)=\omega - \sum\limits _{i=1}^N α _i y _i x _i = 0 \rightarrow \omega = \sum\limits _{i=1}^N α _i y _i x _i$$
+
+$$\nabla_{b}L(\omega,b,\xi,α,\mu)=- \sum\limits _{i=1}^N α _i y _i = 0 \rightarrow \sum\limits _{i=1}^N α _i y _i = 0$$
+
+$$\nabla_{\xi _i}L(\omega,b,\xi,α,\mu) = C- α _i - \mu _i = 0 \rightarrow C- α _i - \mu _i = 0$$
+
+> - 可以推出
+
+$$\max\limits_{α} L(\omega,b,\xi,α,\mu)= - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j^T)+ \sum\limits _{i=1}^N α_i$$
+
+- [x] 相应划分超平面的函数表达：
+
+$$f(x)=sign \left(\sum\limits_{i=1}^N (α^{\*}_i y _i x _i^T)·x+b^{\*} \right)$$
+
+> 注：上述过程仍然需要满足 `KKT条件` ，即满足
+
+$$\begin{cases}
+α_i \geq 0 ,\mu _i geq 0 \newline
+1 - \xi _i - y_i (\omega^T x_i +b) \leq 0 \newline
+α_i·[1 - \xi _i - y_i (\omega^T x_i +b)]=0\newline
+\xi _i \geq 0 ,\mu _i \xi _i =0
+\end{cases}$$
+
+#### 非线性支持向量机————使用核函数映射到高维空间
+
+##### 概述
+
+- [x] 在现实任务中， `原始样本空间内` 也许并不存在一个能正确划分两类样本的超平面，即 `线性不可分`
+
+- [x] 对于 `线性不可分` 的训练数据，可将样本从原始空间映射到一个新的特征空间，使得 `样本数据在新的特征空间内线性可分` ，一般的，这个特征空间是 `高维` 的
+
+<p align="center">
+  <img src="./img/非线性支持向量机.jpg" alt="非线性支持向量机">
+  <p align="center">
+   <span>将低维数据映射为高维空间数据</span>
+  </p>
+</p>
+
+- [x] 线性不可分的二维样本数据映射到三维特征空间，实现线性可分的示例：
+
+<p align="center">
+  <img src="./img/非线性支持向量机1.jpg" alt="非线性支持向量机1">
+  <p align="center">
+   <span>将低维数据映射为高维空间数据</span>
+  </p>
+</p>
+
+- [x] $\phi(x)$ 表示将 $x$ 从低维空间映射到新特征空间对应的特征 `映射函数` 。
+
+##### 对偶问题
+
+- [x] 特征空间中划分超平面： $f(x)=\omega^T \phi(x)+b$ ，
+
+- [x] 优化目标：
+
+$$\min\limits_{\omega,b,\xi_i} \frac{1}{2} ||\omega||^2+C \sum\limits_{i=i}^N \xi _i$$
+
+$$s.t. \ y_i(\omega ^T· \phi (x_i)+b) ≥ 1 - \xi_i , i=1,2,\dots ,N$$
+
+- [x] 对偶问题:
+
+$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(\phi(x _i)^T ·\phi(x _j))+ \sum\limits _{i=1}^N α_i$$
+
+$$s.t. \ \sum\limits _{i=1}^N α _i y _i = 0 ; \ 0 \leq α_i \leq C \ ,i=1,2\dots , N$$
+
+##### 核函数
+
+- [x] 在对偶函数中存在高维运算 $\phi(x _i)^T ·\phi(x _j)$ (也就是映射函数的内积)。定义核函数：
+
+$$\kappa (x_i,x_j)= < \phi(x_i),\phi(x_j) > = \phi(x _i)^T ·\phi(x _j)$$
+
+- [x] 核函数的 `充分必要条件` ： [`对称半正定矩阵`](https://baike.baidu.com/item/%E5%8D%8A%E6%AD%A3%E5%AE%9A%E7%9F%A9%E9%98%B5/2152711) 。
+
+- [x] 因此，只需找到一个满足对称半正定性质的函数，即可作为核函数代入运算，而无需考虑原始的映射函数 $\phi (x)$ (这是因为找映射函数非常难找，同时计算也非常困难，所以直接找核函数方便点)。
+
+- [x] 核函数的引入使得 `SVM` 的优化求解不再局限于找出映射函数 $\phi (x)$ 。
+
+###### 核函数的意义
+
+- [x] 原始的方法中涉及到对 $\phi(x _i)^T ·\phi(x _j)$ 的计算，这是样本 $x_i,x_j$ 映射到新的特征空间后的内积，而新的特征空间往往是 `更高维甚至无穷维` 的，使得对 $\phi(x _i)^T ·\phi(x _j)$ 的直接计算是复杂且困难的。
+
+- [x] 通过核函数，可以将复杂的内积运算，转化为直接的核函数表示，从而有效解决这一问题。
+
+###### 常用的核函数
+
+<p align="center">
+  <img src="./img/常用的核函数.jpg" alt="常用的核函数">
+  <p align="center">
+   <span>常用的核函数</span>
+  </p>
+</p>
+
+###### 基于核函数的对偶问题
+
+- [x] 基于核函数的对偶问题可重写为：
+
+$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j \kappa (x_i,x_j) + \sum\limits _{i=1}^N α_i$$
+
+$$s.t. \ \sum\limits _{i=1}^N α _i y _i = 0 ; \ 0 \leq α_i \leq C \ ,i=1,2\dots , N$$
+
+- [x] 划分超平面基于核函数的表达：
+
+$$f(x)=\omega^T \phi(x)+b=\sum\limits _{i=1}^N α _i y _i \phi(x _i)^T ·\phi(x) +b + \sum\limits _{i=1}^N α _i y _i \kappa (x_i,x) +b$$
+
+##### 难点：如何选择核函数？————示例
+
+<p align="center">
+  <img src="./img/如何选择核函数.jpg" alt="如何选择核函数">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+> - 核函数：
+
+$$\kappa (x_i,x_j)= < x_i,x_j > ^2 = < x_{i_1}x_{j_1}+x_{i_2}x_{j_2} > ^2 = x^2 _{i_1} x^2 _{j_1} +x^2 _{i_2} x^2 _{j_2}+2 x _{i _1} x _{j _1} x _{i _2} x _{j _2}=<(x^2 _{i _1},x^2 _{i_2}, \sqrt{2x _{i _1} x _{i _2}}),(x^2 _{j _1},x^2 _{j _2}, \sqrt{2x _{j _1} x _{j _2}})>$$
+
+> - 多项式核
+
+$$(z_1,z_2,z_3)=\phi(x)=(x^2_1,x^2_2,\sqrt{2x_1x_2})$$
+
+##### 难点：如何选择核函数？————根据样本数 $n$ 与特征维度 $m$
+
+- [x] 一般选用高斯核或者线性核。
+
+- [x] 当 $n,m$ 较大，且特征 $m>>n$ 时，此时考虑高斯核函数的映射后空间维数更高，更复杂，也容易过拟合，因此选用线性核函数。
+
+- [x] 若 $n$ 一般大小，而特征 $m$ 较小，此时进行高斯核函数映射后，不仅能够实现高维空间中线性可分，而且计算方面不会有很大的消耗，因此选用高斯核函数。
+
+- [x] 若 $n$ 很大，而特征 $m$ 较小，同样难以避免计算复杂的问题，因此更多考虑选用线性核函数。灵活运用，具体情况具体分析。
+
+#### 支持向量机的优缺点
+
+- [x] 优点
+  > - 采用核函数的方法克服了 `维数灾难` 和 `非线性可分` 的问题，实现向高维空间映射时不增加计算的复杂性。
+  > -  `软间隔最大化` 利用 `松弛变量` 可以允许一些 `点到分类平面的距离不满足原先要求` ，有效 `避免噪声干扰` 对模型学习的影响。
+
+- [x] 缺点
+  > - 分类效果与核函数的选择关系很大，往往需要尝试多种核函数。
+  > - 难以解决多分类问题。
+
+## 本章小结
+
+<div align="center">
+  <table>
+  <thead>
+    <tr>
+      <th>模型</th>
+      <th>基本概念</th>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>决策树</td>
+      <td>基于特征对实例进行分类的树形结构，本质上是一组规则集合</td>
+      <td>可解释性强，实现简单，运算速度快</td>
+      <td>在训练数据上比较耗时,容易过拟合</td>
+    </tr>
+    <tr>
+      <td>贝叶斯分类器</td>
+      <td>概率框架下实施决策的基本方法，基于概率和误判损失来选择最优的类别标记</td>
+      <td>算法实现简单，收敛速度快</td>
+      <td>只能得到局部最优解，抗干扰能力差，非凸数据集难以收敛</td>
+    </tr>
+    <tr>
+      <td>感知机</td>
+      <td>根据输入实例的特征向量对其进行分类的线性分类模型</td>
+      <td>容易处理高维数据</td>
+      <td>需要大量训练样本；训练时间长</td>
+    </tr>
+    <tr>
+      <td>支持向量机</td>
+      <td>在特征空间上的间隔最大的广义线性分类器，求解凸二次规划的的最优算法</td>
+      <td>模型只与支持向量有关；省了内存，鲁棒性强</td>
+      <td>非线性SVM需要进行核函数映射，计算开销较大,难以解决多分类问题</td>
+    </tr>
+  </tbody>
+  </table>
+</div>
