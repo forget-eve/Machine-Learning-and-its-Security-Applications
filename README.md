@@ -1714,13 +1714,18 @@ $$\hat{y_i}=sign(\frac{2}{3} x _{i_1}+ \frac{2}{3} x _{i_2}-1)$$
 
 - [x] 优化目标： `最大化` 样本集到划分超平面的距离，即:
 
-$$\lambda = \max\limits_{\omega,b}\frac{a}{||\omega||} s.t. \ y_i(\omega x_i+b) \geq a,\forall i$$ 
+$$\lambda = \max\limits_{\omega,b}\frac{a}{||\omega||} \ s.t. \ y_i(\omega ^Tx_i+b) \geq a,\forall i$$ 
+
+> - 注：数学中 $s.t.$ 的意思是 $subject \ to$ 表示受后面的条件约束或者使得后面的条件满足。
+> - 此处有后面的约束条件是因为， $a = \min\limits_{(x_i,y_i)} y_i(\omega ^Tx_i+b)$ 也就是需要将上面中 $a$ 的条件带入进来才可以，不然相当于这个 $a$ 为一个常量，但是实际上还是与样本分布点有关系，所以才需要加上约束条件 。
 
 - [x] 令 $\omega ' = \frac{\omega}{a}$ , $b' =\frac{b}{a}$ ，优化目标即可归一化为:
 
-$$\lambda = \max\limits_{\omega,b}\frac{2}{||\omega '||} s.t. \ y_i(\omega ' x_i+b') \geq 1,\forall i$$ 
+$$\lambda = \max\limits_{\omega,b}\frac{2}{||\omega '||} \ s.t. \ y_i(\omega '^T x_i+b') \geq 1,\forall i$$ 
 
 > - **此处分母不为1，是因为对于两个类别样本集分别到划分超平面都有一个这样的距离，所以乘了2。**
+
+> 上面的 <span id="yueshutiaojian1">约束条件</span> 也可以写为 $y_i(\omega '^T x_i+b') -1 \geq 0,\forall i$
 
 ##### 示例
 
@@ -1755,7 +1760,9 @@ $$\omega^Tx_i+b \geq 1$$
 
 $$\min\limits_{\omega,b} \frac{1}{2} ||\omega||^2$$
 
-$$s.t. \ y_i(\omega · x_i+b)-1≥0, i=1,2,…,N$$
+$$s.t. \ y_i(\omega ^T· x_i+b)-1≥0, i=1,2,…,N$$
+
+> 此处约束条件可以见 <kbd><a href="#/?id=yueshutiaojian1">上面的推导</a></kbd> 。
 
 - [x] 为便于计算，使用拉格朗日乘子法将“间隔最大化”的 `原始问题转换为对偶问题`
 
@@ -1767,9 +1774,98 @@ $$\min\limits_{X \in R^n} f(x) \ s.t. \ c_i(x) ≤ 0,i= 1,2,\dots , k \ h_j(x)=0
 
 > $f(x),c_i(x),h_j(x)$ 均为定义在上的连续可微函数，若不考虑其约束条件，那么对 $f(x)$ 求导数即可求出最优解，但是这在有约束条件的情况下是不可行的；因此引入一种方法将 `约束条件“去掉”`
 
-- [x] 因此引入拉格朗日乘子 $α_i,β_j$ ;，其中 $α_i≥0$ ，定义拉格朗日函数：
+- [x] 因此引入拉格朗日乘子 $α_i,β_j$ ;，其中 $α_i≥0$ ，定义拉格朗日函数(详情可见数分里面的概念)：
 
-$$L(x,α,β)=f(x)+\sum\limits_{i=1}^k α_ic_i(x)+\sum\limits_{j=1}^l α_jh_j(x)$$
+$$L(x,α,β)=f(x)+\sum\limits_{i=1}^k α_ic_i(x)+\sum\limits_{j=1}^l β_jh_j(x)$$
+
+- [x] 当且仅当在满足约束条件且 $α_i≥0$ 时，原始问题等价为:
+
+$$\min\limits_{x} f(x) = \min\limits_{x} \max\limits_{α,β:α_i \geq 0} L(x,α,β)$$
+
+> - 证明如下:
+> - 首先考虑后半部分，对 $L(x,α,β)$ 关于参数 $α_i,β_j$ 求最大值，此时 $α_i,β_j$ 的值将被固定，此最大值即为只与 $x$ 有关的函数，定义该函数为：
+
+$$\theta_p(x)=\max\limits_{α,β:α_i \geq 0}L(x,α,β)$$
+
+> - 对于原拉格朗日函数： $L(x,α,β)=f(x)+\sum\limits_{i=1}^k α_ic_i(x)+\sum\limits_{j=1}^l β_jh_j(x)$
+> - 当满足原始约束条件 $\lbrace c_i(x)≤0,h_j(x)=0|i=1,2, \dots ,k;j=1,2,\dots ,l\rbrace$ 且 $α_i≥0$ 时，易得 $α_i·c_i(x)≤0$ 且 $β_j·h_j(x)=0$ ,该函数的最大值为 $f(x)$ 。若不满足条件，则该函数最大值趋于 $+ \infty$ (如 $α_i$ ，趋于 $+ \infty$ 使 $α_i·c_i(x)$ 趋于 $+ \infty$ 。(此处也就是因为对于 $c_i(x)$ 没有约束条件了，此处有假设 $α_i≥0$ ， $c_i(x) > 0$ 那么就有上面的情况)
+> - 证得：
+
+$$\theta_p(x)=\begin{cases}
+f(x) , & x \text{满足原始问题约束且} α_i≥0 \newline
++ \infty ,& \text{其他}
+\end{cases}
+$$
+
+> - 因此得证： $\min\limits_{x} f(x) = \min\limits_{x}\theta_p(x)=\min\limits_{x} \max\limits_{α,β:α_i \geq 0} L(x,α,β)$
+
+##### 数学原理的推导与证明： $对偶问题$
+
+- [x] 针对 `原始问题` ：
+
+$$\min\limits_{x} f(x) = \min\limits_{x}\theta_p(x)=\min\limits_{x} \max\limits_{α,β:α_i \geq 0} L(x,α,β)$$
+
+- [x] 定义其 `对偶问题` ：
+
+$$\max\limits_{α,β:α_i \geq 0} \theta_{D}(α,β) = \max\limits_{α,β:α_i \geq 0} \min\limits_{x} L(x,α,β)$$
+
+> 可以看成两种问题在形式上是对称的，只是优化参数顺序的不同
+
+- [x] 当且仅当 [`KKT条件`](#/?id=KKT) 满足时， ***原始问题与对偶问题的最优值相等*** 。
+
+##### 数学原理的推导与证明： $KKT条件$
+
+- [x] 存在 $L(x^{\*},α^{\*},β^{\*})$ ，其中 $x^{\*},a^{\*}$ 和 $β^{\*}$ 同时为 `原始问题和对偶问题` 的 `最优解` 的 `充分必要条件` 是 $x^{\*},a^{\*}$ 和 $β^{\*}$ <span id="KKT">满足</span> `KKT条件` ：
+
+$$\nabla_x L(x^{\*},α^{\*},β^{\*})=0 \ (鞍点满足条件)$$
+
+$$\nabla_α L(x^{\*},α^{\*},β^{\*})=0 \ (鞍点满足条件)$$
+
+$$\nabla_β L(x^{\*},α^{\*},β^{\*})=0 \ (鞍点满足条件)$$
+
+$$α_i^{\*} c_i(x^{\*})=0 \ ,i=1,2\dots , k \ (使最大值f(x)可以取得的约束条件)$$
+
+$$c_i(x^{\*}) ≤ 0 \ ,i=1,2\dots , k \ (原始约束条件)$$
+
+$$α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \ (引入α_i^{\*}的约束条件)$$
+
+$$h(x^{\*})= 0 ,j=1,2,\dots , l (原始约束条件)$$
+
+> - 关于证明该为充要条件， [`请点击此处`](https://blog.csdn.net/gaofeipaopaotang/article/details/108058871)
+
+##### 支持向量机的对偶问题求解
+
+- [x] 回顾原始问题:
+
+$$\min\limits_{\omega,b} \frac{1}{2} ||\omega||^2$$
+
+$$s.t. \ y_i(\omega ^T· x_i+b)-1≥0, i=1,2,…,N$$
+
+- [x] 首先引入拉格朗日乘子向量 $α=(α_1,α_2,\dots ,α_N),α_i \geq 0$ ，定义拉格朗日函数：
+
+$$L(\omega,b,α)=\frac{1}{2} ||\omega||^2+\sum\limits_{i=1}^N α_i·[1-y_i(\omega ^T· x_i+b)]=\frac{1}{2} ||\omega||^2-\sum\limits_{i=1}^N α_i·y_i(\omega ^T· x_i+b)+\sum\limits_{i=1}^N α_i$$
+
+- [x] 对偶问题 <kbd>求解步骤</kbd> :
+  > - (1) 满足 `KKT条件` ，
+  > - (2) 通过将 **参数 $\omega,b$ 用 $α$ 表示** ，将原函数 **转换为只与 $α$ 有关的函数(对偶问题)，根据对偶问题形式求解 $a^{\*}$ 。**
+  > - (3) 根据求得的对偶问题的解 $α^{\*}$ ， **推及得到原始问题的解 $\omega^{\*}，b^{\*}$ 。**
+
+> - 步骤一：列出相关 `KKT条件`
+
+$$\nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+
+$$\nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+
+$$\nabla_α L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+
+$$α_i^{\*} c_i(x^{\*})=0 \ ,i=1,2\dots , k \ (使最大值f(x)可以取得的约束条件)$$
+
+$$c_i(x^{\*}) ≤ 0 \ ,i=1,2\dots , k \ (原始约束条件)$$
+
+$$α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \ (引入α_i^{\*}的约束条件)$$
+
+$$h(x^{\*})= 0 ,j=1,2,\dots , l (原始约束条件)$$
+
 
 #### 线性支持向量机
 ##### 硬间隔
