@@ -1780,7 +1780,7 @@ $$L(x,α,β)=f(x)+\sum\limits_{i=1}^k α_ic_i(x)+\sum\limits_{j=1}^l β_jh_j(x)$
 
 - [x] 当且仅当在满足约束条件且 $α_i≥0$ 时，原始问题等价为:
 
-$$\min\limits_{x} f(x) = \min\limits_{x} \max\limits_{α,β:α_i \geq 0} L(x,α,β)$$
+$$\min\limits _{x} f(x) = \min\limits _{x} \max\limits _{α,β:α_i \geq 0} L(x,α,β)$$
 
 > - 证明如下:
 > - 首先考虑后半部分，对 $L(x,α,β)$ 关于参数 $α_i,β_j$ 求最大值，此时 $α_i,β_j$ 的值将被固定，此最大值即为只与 $x$ 有关的函数，定义该函数为：
@@ -1793,10 +1793,10 @@ $$\theta_p(x)=\max\limits_{α,β:α_i \geq 0}L(x,α,β)$$
 
 $$\theta_p(x)=\begin{cases}
 f(x) , & x \text{满足原始问题约束且} α_i≥0 \newline
-+ \infty ,& \text{其他}
+\text{+} \infty ,& \text{其他} \newline
 \end{cases}$$
 
-> - 因此得证： $\min\limits _{x} f(x) = \min\limit s _{x} \theta _p(x)=\min\limits _{x} \max\limits _{α,β:α_i \geq 0} L(x,α,β)$
+> - 因此得证： $\min\limits _{x} f(x) = \min\limits _{x} \theta _p(x)=\min\limits _{x} \max\limits _{α,β:α_i \geq 0} L(x,α,β)$
 
 ##### 数学原理的推导与证明： $对偶问题$
 
