@@ -4,7 +4,7 @@
 
 - [x] 一次作业(单独完成)，看情况布置， ~~可能不布置~~ ，提交代码和书面报告。 **本学期(24春)没有，已经定了。**
 
-- [x] 一次课程项目(组队完成)，提交代码和书面报告，并进行课堂汇报
+- [x] 一次课程项目(组队完成，本学期5人一组)，提交代码和书面报告，并进行课堂汇报
 
 <div align="center">
   <table>
@@ -1794,10 +1794,9 @@ $$\theta_p(x)=\max\limits_{α,β:α_i \geq 0}L(x,α,β)$$
 $$\theta_p(x)=\begin{cases}
 f(x) , & x \text{满足原始问题约束且} α_i≥0 \newline
 + \infty ,& \text{其他}
-\end{cases}
-$$
+\end{cases}$$
 
-> - 因此得证： $\min\limits_{x} f(x) = \min\limits_{x}\theta_p(x)=\min\limits_{x} \max\limits_{α,β:α_i \geq 0} L(x,α,β)$
+> - 因此得证： $\min\limits _{x} f(x) = \min\limit s _{x} \theta _p(x)=\min\limits _{x} \max\limits _{α,β:α_i \geq 0} L(x,α,β)$
 
 ##### 数学原理的推导与证明： $对偶问题$
 
@@ -1843,7 +1842,7 @@ $$s.t. \ y_i(\omega ^T· x_i+b)-1≥0, i=1,2,…,N$$
 
 - [x] 首先引入拉格朗日乘子向量 $α=(α_1,α_2,\dots ,α_N),α_i \geq 0$ ，定义拉格朗日函数：
 
-$$L(\omega,b,α)=\frac{1}{2} ||\omega||^2+\sum\limits_{i=1}^N α_i·[1-y_i(\omega ^T· x_i+b)]=\frac{1}{2} ||\omega||^2-\sum\limits_{i=1}^N α_i·y_i(\omega ^T· x_i+b)+\sum\limits_{i=1}^N α_i$$
+$$L(\omega,b,α)=\frac{1}{2} ||\omega||^2+\sum\limits _{i=1}^N α_i·[1-y _i(\omega ^T· x_i+b)]=\frac{1}{2} ||\omega||^2-\sum\limits _{i=1}^N α _i·y _i(\omega ^T· x _i+b)+\sum\limits _{i=1}^N α _i$$
 
 - [x] 对偶问题 <kbd>求解步骤</kbd> :
   > - (1) 满足 `KKT条件` ，
