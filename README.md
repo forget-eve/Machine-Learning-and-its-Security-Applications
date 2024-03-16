@@ -1983,7 +1983,7 @@ $$f(x)=sign \left(\sum\limits_{i=1}^N (α^{\*}_i y _i x _i^T)·x+b^{\*} \right)$
 > 注：上述过程仍然需要满足 `KKT条件` ，即满足
 
 $$\begin{cases}
-α_i \geq 0 ,\mu _i geq 0 \newline
+α_i \geq 0 ,\mu _i \geq 0 \newline
 1 - \xi _i - y_i (\omega^T x_i +b) \leq 0 \newline
 α_i·[1 - \xi _i - y_i (\omega^T x_i +b)]=0\newline
 \xi _i \geq 0 ,\mu _i \xi _i =0
