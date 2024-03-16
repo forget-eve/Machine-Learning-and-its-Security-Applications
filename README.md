@@ -1806,7 +1806,7 @@ $$\min\limits_{x} f(x) = \min\limits_{x}\theta_p(x)=\min\limits_{x} \max\limits_
 
 - [x] 定义其 `对偶问题` ：
 
-$$\max\limits_{α,β:α_i \geq 0} \theta_{D}(α,β) = \max\limits_{α,β:α_i \geq 0} \min\limits_{x} L(x,α,β)$$
+$$\max\limits _{α,β:α _i \geq 0} \theta _{D}(α,β) = \max\limits _{α,β:α _i \geq 0} \min\limits _{x} L(x,α,β)$$
 
 > 可以看成两种问题在形式上是对称的，只是优化参数顺序的不同
 
@@ -1844,27 +1844,41 @@ $$s.t. \ y_i(\omega ^T· x_i+b)-1≥0, i=1,2,…,N$$
 
 $$L(\omega,b,α)=\frac{1}{2} ||\omega||^2+\sum\limits _{i=1}^N α_i·[1-y _i(\omega ^T· x_i+b)]=\frac{1}{2} ||\omega||^2-\sum\limits _{i=1}^N α _i·y _i(\omega ^T· x _i+b)+\sum\limits _{i=1}^N α _i$$
 
+> - 那么对比上述原始问题中 $f(x) = \frac{1}{2} ||\omega||^2$ ， $c _i(x) = 1-y _i(\omega ^T· x _i+b) \leq 0$ ， $h_j(x)=0$ (这个是显然的)。
+
 - [x] 对偶问题 <kbd>求解步骤</kbd> :
   > - (1) 满足 `KKT条件` ，
-  > - (2) 通过将 **参数 $\omega,b$ 用 $α$ 表示** ，将原函数 **转换为只与 $α$ 有关的函数(对偶问题)，根据对偶问题形式求解 $a^{\*}$ 。**
+  > - (2) 通过将 **参数 $\omega,b$ 用 $α$ 表示** ，将原函数 **转换为只与 $α$ 有关的函数(对偶问题)，根据 `对偶问题形式` 求解 $a^{\*}$ 。**
   > - (3) 根据求得的对偶问题的解 $α^{\*}$ ， **推及得到原始问题的解 $\omega^{\*}，b^{\*}$ 。**
 
 > - 步骤一：列出相关 `KKT条件`
 
-$$\nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+$$(1) \ \nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
 
-$$\nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+$$(2) \ \nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
 
-$$\nabla_α L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
+$$(3) \ \nabla_α L(\omega^{\*},b^{\*},α^{\*})=0 \ (鞍点满足条件)$$
 
-$$α_i^{\*} c_i(x^{\*})=0 \ ,i=1,2\dots , k \ (使最大值f(x)可以取得的约束条件)$$
+$$(4) \ α_i^{\*} c_i(x^{\*})=0 \ ,i=1,2\dots , k \ (使最大值f(x)可以取得的约束条件)$$
 
-$$c_i(x^{\*}) ≤ 0 \ ,i=1,2\dots , k \ (原始约束条件)$$
+$$(5) \ c_i(x^{\*}) ≤ 0 \ ,i=1,2\dots , k \ (原始约束条件)$$
 
-$$α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \ (引入α_i^{\*}的约束条件)$$
+$$(6) \ α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \ (引入α_i^{\*}的约束条件)$$
 
-$$h(x^{\*})= 0 ,j=1,2,\dots , l (原始约束条件)$$
+> - 步骤二：将参数 $\omega,b$ 用 $α$ 表示，得到 `对偶问题格式` ：
+> > - 首先根据 `KKT条件` (1),(2),(6)求解([`矩阵求导公式`](https://blog.csdn.net/weixin_45816954/article/details/119817108?app_version=6.2.9&code=app_1562916241&csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22119817108%22%2C%22source%22%3A%222301_79807208%22%7D&uLinkId=usr1mkqgl919blen&utm_source=app))：
 
+$$(1) \ \nabla_{\omega} L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow - \sum\limits _{i=1}^N a _i y _i \omega x _i = 0 \rightarrow \omega = \sum\limits _{i=1}^N a _i y _i x _i$$
+
+$$(2) \ \nabla_b L(\omega^{\*},b^{\*},α^{\*})=0 \rightarrow - \sum\limits _{i=1}^N a _i y _i = 0 \rightarrow \sum\limits _{i=1}^N a _i y _i = 0$$
+
+$$(6) \ α_i^{\*} ≥ 0 \ ,i=1,2\dots , k \rightarrow 保留$$
+
+> > - 将上述(1)(2)结果关系式代入，得到对偶问题:
+
+$$\max\limits _{α} - \frac{1}{2} \sum\limits _{i=1}^N \sum\limits _{j=1}^N α _i α _j y _i y _j(x _i ·x _j)+ \sum\limits _{i=1}^N α_i$$
+
+$$s.t.$$
 
 #### 线性支持向量机
 ##### 硬间隔
