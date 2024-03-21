@@ -1470,7 +1470,7 @@ $$\min\limits_{\hat{\omega}} L(\hat{\omega})=\min\limits_{\hat{\omega}} -\sum\li
   <img src="./img/梯度下降法.jpg" alt="梯度下降法">
 </p>
 
-> - 当输入 $x4 是向量时， $f(x)$ 的梯度记为 $\nabla _x f(x)=(\frac{\partial f}{\partial x_1},\frac{\partial f}{\partial x_2},\dots ,\frac{\partial f}{\partial x_d})^T$
+> - 当输入 $x$ 是向量时， $f(x)$ 的梯度记为 $\nabla _x f(x)=(\frac{\partial f}{\partial x_1},\frac{\partial f}{\partial x_2},\dots ,\frac{\partial f}{\partial x_d})^T$
 
 > - 由梯度的数学定义可知：梯度的反方向是使 $f$ 下降最快的方向，所以在梯度下降法中，一般沿着梯度的反方向更新自变量：
 
@@ -2187,6 +2187,13 @@ $$z=a_1w_1+\dots+a_kw_k+\dots+a_Kw_K+b$$
   > - 1.为了增强网络的表达能力，需要激活函数来线性函数改为非线性函数；
   > - 2.非线性的激活函数通常具有连续性，因为连续非线性激活函数可以求导，所以可以用最优化的方法来求解。
 
+<p align="center">
+  <img src="./img/常见激活函数.jpg" alt="常见激活函数">
+  <p align="center">
+   <span>常见激活函数</span>
+  </p>
+</p>
+
 ### 网络结构
 
 - [x] 神经元不同的连接方式构成不同的网络结构
@@ -2194,9 +2201,92 @@ $$z=a_1w_1+\dots+a_kw_k+\dots+a_Kw_K+b$$
 
 ## 前馈神经网络
 
-> 从左到右依此推导
+### 计算示例
 
-### 神经网络的优化:损失函数
+<p align="center">
+  <img src="./img/前馈神经网络1.jpg" alt="前馈神经网络">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+> - 上图中这个值为 `4` 的 $z_1$ (第二列上方的圆形节点)推导为两个最初的神经元(最左边一列的两个圆形节点，后面用圆形节点表示神经元)值 `1` 和 `-1` 分别乘上它们的权重值(对应箭头上的值) `1` 和 `-2` 相加后再加上偏置参数 `1` (第二列上方新神经元下三角形内的值)，也就是 `1×1+(-1)×(-2)+1=4` ，第二个 $z_2$ 值为 `-2=1×(-1)+(-1)×1+0` 。而右侧 $z_1$ 的 `0.98` 为 $z_1$ 通过激活函数 $f$ ，也就是从此处输出的 $f(z_1)=0.98$ ，下方的为 $f(z_2)0.12$ 。故两个新神经元的值为 `0.98` 和 `0.12` 。
+> - 从左到右依此推导所得结果如下所示
+
+<p align="center">
+  <img src="./img/前馈神经网络2.jpg" alt="前馈神经网络">
+  <p align="center">
+   <span>示例结果</span>
+  </p>
+</p>
+
+> - 根据输入和最后的输出值，可以得到该神经网络的最终函数表达式
+
+$$f\left(\left[ \begin{matrix}
+1\newline
+-1\end{matrix}\right]\right)=\left[\begin{matrix}
+0.62 \newline
+0.83 \end{matrix}\right]
+$$
+
+### 相关概念
+
+<p align="center">
+  <img src="./img/前馈神经网络3.jpg" alt="相关概念">
+  <p align="center">
+   <span>相关概念</span>
+  </p>
+</p>
+
+#### 输出层
+
+- [x] 常用 `softmax` 函数作为输出层激活函数：$y_i = \frac{e^{z_i}}{\sum\limits_{j=1}^ne^{z_j}}$ ，容易理解、便于计算。
+
+<p align="center">
+  <img src="./img/前馈神经网络4.jpg" alt="输出层">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+> 相当于计算概率值：
+> - $1 > y_i > 0$
+> - $\sum\limits_{i=1} y_i=1$
+
+### 应用示例:手写识别
+
+<p align="center">
+  <img src="./img/应用示例手写识别.jpg" alt="应用示例:手写识别">
+  <p align="center">
+   <span>应用示例:手写识别</span>
+  </p>
+</p>
+
+> 也就是分别输入 `256` 个像素点的值，然后输出分别为 `0-9` 中可能的数字对应概率，此例中当然希望为 `8` 的概率更大。
+
+## 神经网络的优化:损失函数
+
+<p align="center">
+  <img src="./img/应用示例手写识别1.jpg" alt="应用示例:手写识别">
+  <p align="center">
+   <span>应用示例:手写识别</span>
+  </p>
+</p>
+
+- [x] 希望误差最小化，下面的示例中则希望除了识别为 `1` ，其他所有概率为 $0$
+
+<p align="center">
+  <img src="./img/应用示例手写识别2.jpg" alt="应用示例:手写识别">
+  <p align="center">
+   <span>应用示例:手写识别</span>
+  </p>
+</p>
+
+> 对所有训练数据，希望有总损失: $L=\sum\limits_{r=1}^Rl_r$ 尽可能小，则此时要对神经网络中各神经元的权值和偏置参数进行调整，也就是需要进行 `参数学习` 。
+
+<p align="center">
+  <img src="./img/应用示例手写识别3.jpg" alt="应用示例:手写识别">
+</p>
 
 ## 神经网络的优化:参数学习
 
@@ -2241,7 +2331,7 @@ $$z=a_1w_1+\dots+a_kw_k+\dots+a_Kw_K+b$$
 #### 反向传播算法
 
 - [x] 反向传播算法
-  > - 也就是每一轮对所有的的 $w_i$ 进行优化，使得总的误差减小，但是这个只能得到局部最优解，因为 $w_i$ 在每轮中都是依此更新的，所以在后面的 $w_j$ 更新完以后，可能前面的 $w_i(i < j)$ 由不符合最优结果了，但是这个算法总题上是使得总的误差减小的。
+  > - 也就是每一轮对所有的神经元权重 $w_i$ 进行优化，使得总的误差减小，但是这个只能得到局部最优解，因为 $w_i$ 在每轮中都是依此更新的，所以在后面的 $w_j$ 更新完以后，可能前面的 $w_i(i < j)$ 又不符合最优结果了，但是这个算法总体上是使得总的误差减小的。
 
 <p align="center">
   <img src="./img/反向传播算法.jpg" alt="反向传播算法">
@@ -2255,12 +2345,55 @@ $$z=a_1w_1+\dots+a_kw_k+\dots+a_Kw_K+b$$
 
 ##### 信号正向传播
 
-- [x] 信号正向传播
+- [x] 假设第 $l$ 层神经元状态为 $z^l$，经激活函数后的输出值为 $y^l$
+
+<p align="center">
+  <img src="./img/信号正向传播.jpg" alt="信号正向传播">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+> - $z_1^1=w_{11}^1x_1+w_{21}^1x_2+\dots +w_{n1}^1x_n+b_1^1$
+> - 则经过激活函数后输出为 $y_1^1=f(z_1^1)=f(w_{11}^1x_1+w_{21}^1x_2+\dots +w_{n1}^1x_n+b_1^1)$
+> - 同理， $y_2^1=f(z_2^1)=f(w_{12}^1x_1+w_{22}^1x_2+\dots +w_{n2}^1x_n+b_2^1)$
+> - 同理， $y_3^1=f(z_3^1)=f(w_{13}^1x_1+w_{23}^1x_2+\dots +w_{n3}^1x_n+b_3^1)$
+> - $此处只考虑三个神经元$ (其他多个神经元时同理)
+> - 那么有， $V=f(w_1^2y_1^1+w_2^2y_2^1+w_3^2y_3^1+b_2)$
 
 ##### 反向传播算法求解梯度 $\frac{\partial{L}}{\partial{w_i}}$
 
 > - ~~也就是用空间换时间。~~
 
+- [x] 算法示例: $e=(a+b)·(b+1)$ ，求 $\frac{\partial{e}}{\partial{a}},$\frac{\partial{e}}{\partial{b}}$
+  > - 引入两个中间变量 $c,d:c=a+b,d=b+1,e=e·d$ ，那么可以得到下面的 `树状图1`
+
+<p align="center">
+  <img src="./img/反向传播算法求解梯度1.jpg" alt="反向传播算法求解梯度">
+  <p align="center">
+   <span>树状图1</span>
+  </p>
+</p>
+
+> - 若对上述树状图中的自下而上进行赋值并求对应的偏导，则如 `树状图2` 所示
+
+<p align="center">
+  <img src="./img/反向传播算法求解梯度2.jpg" alt="反向传播算法求解梯度">
+  <p align="center">
+   <span>树状图2</span>
+  </p>
+</p>
+
 - [x] 链式法则
+  > - $\frac{\partial{e}}{\partial{a}}=\frac{\partial{e}}{\partial{c}}·\frac{\partial{c}}{\partial{a}}$ 图中 $\frac{\partial{e}}{\partial{a}}$ 的值等于从 $a$ 到 $e$ 的路径上的偏导值的乘积
+  > - $\frac{\partial{e}}{\partial{b}}=\frac{\partial{e}}{\partial{c}}·\frac{\partial{c}}{\partial{b}}+\frac{\partial{e}}{\partial{d}}·\frac{\partial{d}}{\partial{b}}$ 上图中 $\frac{\partial{e}}{\partial{b}}$ 的值等于从 $b$ 到 $e$ 的路径( $b-c-e$ )上的偏导值的乘积加上路径( $b-d-e$ )上的偏导值的乘积。
+  > - 若自下而上求解，很多路径被重复访问了。比如图中，求 $\frac{\partial{e}}{\partial{a}}$ 需要计算路径 $a-c-e$ ，求 $\frac{\partial{e}}{\partial{b}}$ 都需要计算路径 $b-c-e$ 和 $b-d-e$ ，路径 $c-e$ 被访问了两次。
+
+> - 那么此时不自下而上求解
+> - 自上而下：从最上层的节点 $e$ 开始，对于 $e$ 的下一层的所有子节点，将 $e$ 的值( $e$ 是最顶点，值 $=1$ )乘以 $e$ 到某个节点路径上的偏导值，并将结果发送到该子节点中。 该子节点的值被设为“发送过来的值”，继续此过程向下传播
+> - 第一层：节点 $e$ 初始值为 $1$
+> - 第二层：节点 $e$ 向节点 $c$ 发送 $1×2$ ，节点 $e$ 向节点得 $d$ 发送 $1×3$ ，节点 $c$ 值为 $2$ ，节点 $d$ 值为 $3$
+> - 第三层：节点 $c$ 向 $a$ 发送 $2×1$ ，节点 $c$ 向 $b$ 发送 $2×1$ ，节点 $d$ 向 $b$ 发送 $3×1$ ，节点 $a$ 值为 $2$ ，节点 $b$ 值为 $2×1+3×1=5$
+> - 即顶点 $e$ 对 $a$ 的偏导数为 $2$ ，顶点 $e$ 对 $b$ 的偏导数为5。
 
 ## 卷积神经网络
