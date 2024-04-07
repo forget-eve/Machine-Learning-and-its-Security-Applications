@@ -525,6 +525,8 @@ D-->|是|E[产生测试效果]
 D-->|否|A
 ```
 
+<br>
+
 # 第三章 分类
 ## 概述
 
@@ -2147,6 +2149,7 @@ $$(z_1,z_2,z_3)=\phi(x)=(x^2_1,x^2_2,\sqrt{2x_1x_2})$$
   </tbody>
   </table>
 </div>
+<br>
 
 # 第四章 聚类
 
@@ -2161,11 +2164,11 @@ $$(z_1,z_2,z_3)=\phi(x)=(x^2_1,x^2_2,\sqrt{2x_1x_2})$$
 
 - [x] 将数据集 $D = \lbrace x_1,x_2,\dots ,x_N\rbrace$ 分为 $k$ 个不相交的子集：
 
-$$\lbrace C_l_l|l=1,2,\dots ,k\rbrace, C_i \cap C_j = \varnothing 且 D = \cup C_j$$
+$$\lbrace C_l|l=1,2,\dots ,k\rbrace, C_i \cap C_j = \varnothing 且 D = \cup C_j$$
 
 - [x] 每个子集 $C_l$ 称为一个“簇”(cluster)，每个簇对应于一些潜在的概念(类别)
 
-- [x] 对于 $x_i \in C_1$ ，称 $x_i$ 具有簇标记 $\lamda _l$
+- [x] 对于 $x_i \in C_1$ ，称 $x_i$ 具有簇标记 $\lambda _l$
 
 ### 目的
 
@@ -2178,7 +2181,7 @@ $$\lbrace C_l_l|l=1,2,\dots ,k\rbrace, C_i \cap C_j = \varnothing 且 D = \cup C
 - [x] 其他任务的前置过程
   > - 一开始没有水果类型的定义，先对水果进行聚类，根据聚类结果将每个簇定义为一个类，再基于这些类训练分类模型，用于判断新样本的类型。
 
-## $K-means$
+## $K-means$ (K均值算法)
 
 ### 场景
 
@@ -2193,6 +2196,7 @@ $$\lbrace C_l_l|l=1,2,\dots ,k\rbrace, C_i \cap C_j = \varnothing 且 D = \cup C
 - [x] 需要预先设定好划分的簇数
 
 - [x] 聚类目标：
+
 > - 最小化样本与其所属类中心之间的距离的总和 $E$ ：
 
 $$E=\sum\limits_{j=1}^k \sum\limits_{x \in C_j} ||x-\mu_j||^2_2$$
@@ -2215,7 +2219,7 @@ $$\mu_j j \in \lbrace 1,\dots ,k \rbrace$$
 
 - [x] 计算每个样本到各个聚类中心的距离，将样本分配给距离最近的簇
 
-$$\lamda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace$}}{\arg\min} d(x_i,\mu_j)$$
+$$\lambda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace}}{\arg\min} d(x_i,\mu_j)$$
 
 - [x] 根据新的簇划分结果，更新聚类中心： $\mu_j'=\frac{1}{|C_j|}\sum\limits_{x \in C_j}x$
 
@@ -2224,7 +2228,7 @@ $$\lamda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace$}}{\arg\min} d(
 - [x] 样本间距离计算
 
 <p align="center">
-  <img src="./img/样本间距离计算.jpg" alt="样本间距离计算">
+  <img src="./img/样本间距离计算.png" alt="样本间距离计算">
 </p>
 
 #### $k-means$ 算法
@@ -2235,15 +2239,15 @@ $$\lamda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace$}}{\arg\min} d(
 > - Do
 > > - 计算每个样本到聚类中心的距离，将样本分配给距离最近的簇
 
-$$\lamda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace$}}{\arg\min} d(x_i,\mu_j)$$
+$$\lambda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace$}}{\arg\min} d(x_i,\mu_j)$$
 
-$$C _{\lamda_i} = C _{\lamda_i} \cup \lbrace x_i \rbrace$$
+$$C _{\lambda_i} = C _{\lambda_i} \cup \lbrace x_i \rbrace$$
 
 > > - 更新聚类中心
 
 $$\mu_j'=\frac{1}{|C_j|}\sum\limits_{x \in C_j}x$$
 
-$$if \ \mu_j \not = \mu_j' then \mu_j=\mu_j'$$
+$$if \ \mu_j \not = \mu_j' \ then \ \mu_j=\mu_j'$$
 
 > - $Until \ \mu_j == \mu_j'(收敛)$
 
@@ -2266,7 +2270,7 @@ $$\frac{\partial{E}}{\partial{\mu_j}} = 2\sum\limits_{i=1}^N r_{ij}(x_i-\mu_j)=0
 
 $$\mu_j = \frac{\sum\limits_{i=1}^N r_{ij}x_i}{\sum\limits_{i=1}^N r_{ij}}=\frac{1}{|C_j|} \sum\limits_{x \in C_j}x$$
 
-> - 最后一步 $\sum\limits_{i=1}^N r_{ij = |C_j|,\sum\limits_{i=1}^N r_{ij}x_i=\sum\limits_{x \in C_j}x$，得到的结果即聚类中心的更新公式
+> - 最后一步 $\sum\limits_{i=1}^N r_{ij} = |C_j|,\sum\limits_{i=1}^N r_{ij}x_i=\sum\limits_{x \in C_j}x$，得到的结果即聚类中心的更新公式
 
 - [x] 每步选择使目标函数最小的更新结果，是一种贪心算法
 
@@ -2278,8 +2282,7 @@ $$\mu_j = \frac{\sum\limits_{i=1}^N r_{ij}x_i}{\sum\limits_{i=1}^N r_{ij}}=\frac
 
 - [x] 改进：手肘法确定 $K$ 值
   > - 使用不同的 $K$ 多次运行，选择拐点
-
-> - 拐点也就是函数拟合后，在函数图像上拐弯的点。
+  > - 拐点也就是函数拟合后，在函数图像上拐弯的点。
 
 #### 贪心算法容易局部最优，对初始中心点的选择敏感
 
@@ -2302,15 +2305,78 @@ $$\mu_j = \frac{\sum\limits_{i=1}^N r_{ij}x_i}{\sum\limits_{i=1}^N r_{ij}}=\frac
   > - 大小不一致
   > - 密度不一致
 
+<p align="center">
+  <img src="./img/易受数据分布特性的影响问题.jpg" alt="易受数据分布特性的影响问题">
+</p>
+
 - [x] 改进：过分割+后处理进行缓解
   > - 选择较大的聚类数 $K$ 进行过分割,得到 $K$ 个较小的簇
   > - 将 $K$ 个较小簇进行聚合成所需簇数
 
-### 高斯混合模型
+<p align="center">
+  <img src="./img/易受数据分布特性的影响改进.jpg" alt="易受数据分布特性的影响改进">
+</p>
 
-### 密度聚类
+## 高斯混合模型
 
-### 层次聚类
+### 数据点与高斯分布
+
+- [x] 自然界中数据常常符合高斯分布( $p(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ )的规律
+  > - 身高分布
+  > - 水果的重量和酸度的联合分布
+
+> - 如果是多元向量 $\vec{x}$，那么有高斯分布 $p(\vec{x})=\frac{1}{(2\pi)^{\frac{n}{2}}\sqrt{|\sum|}}e^{-\frac{(\vec{x}-\vec{\mu})^T}{2\sum(\vec{x}-\vec{\mu})}}$
+> - $n$ 为向量 $\vec{x}$ 的维度
+
+### 场景
+
+- [x] 小明去买水果，仓库里有苹果和西瓜的库存，西瓜的数量是苹果的 $9$ 倍
+  > - 现在有一个 $1.6kg$ 的水果盲盒，小明想要大苹果而不是小西瓜，他进行了如下判断:
+  > - 已知苹果重量符合高斯分布： $N_1(\mu_1 = 0.1,\sigma _1^2 = 0.01)$ ，那么苹果重 $1.6kg$ 的概率密度 $=0.38$
+  > - 已知西瓜重量符合高斯分布： $N_2(\mu_2 = 3,\sigma _2^2 = 0.25)$ ，那么西瓜重 $1.6kg$ 的概率密度 $=0.05$
+
+- [x] 苹果概率 $0.38 >$ 西瓜概率 $0.05$ ，盲盒更可能是大苹果，小明决定购买，但回家拆开发现是小西瓜，上述计算方法是否合理呢？
+
+#### 分析
+
+- [x] **小明忽视了仓库里西瓜的数量是苹果的 $9$ 倍**
+  > - 按照仓库里的水果数量比例，一个水果盲盒有 $0.9$ 的概率是西瓜，有 $0.1$ 的概率是苹果
+  > - 需要同时考虑水果重量和水果比例
+  > > - $苹果比例×苹果重1.6kg的概率=0.1×0.38=0.038$
+  > > - $西瓜比例×西瓜重1.6kg的概率=0.9×0.05=0.045$
+  > > - $0.038 < 0.045$ ，这个 $1.6kg$ 的水果盲盒更有可能是西瓜
+  > >
+  > > - 考虑水果比例和各自的重量分布，能够给出仓库里水果的重量分布：
+
+$$f(x)= 0.1×N_1(x|\mu_1,\sigma _1^2)+0.9×N_2(x|\mu_2,\sigma _2^2)$$
+
+> - $N_i$ 代表水果重量
+
+### 高斯混合模型：多个高斯分布的组合
+
+- [x] 一元高斯混合模型：
+
+$$p(x)=\sum\limits_{i=1}^k \alpha_iN(x|\mu_i,\sigma_i^2) \ , \ where \ \sum\limits_i \alpha_i = 1$$
+
+- [x] 多元高斯混合模型:
+
+$$p(x)=\sum\limits_{i=1}^k \alpha_iN(x|\mu_i,\sum_i) \ , \ where \ \sum\limits_i \alpha_i = 1$$
+
+> - 混合高斯分布由 $k$ 个混合成分组成，每个混合成分对应一个高斯分布，其中 $\mu_i$ 与 $\sigma^2 / \sum_i$ 是第 $i$ 个高斯混合成分的的均值和方差， $\alpha_i > 0$ 是相应的“混合系数”。 
+
+### GMM为什么能用于聚类
+
+- [x] 用高斯分布拟合数据分布
+
+- [x] 每个高斯分布对应一个簇
+
+- [x] 计算后验概率进行簇的判别
+
+
+
+## 密度聚类
+
+## 层次聚类
 
 # 第七章 深度学习:神经网络
 
