@@ -2317,7 +2317,7 @@ $$\mu_j = \frac{\sum\limits_{i=1}^N r_{ij}x_i}{\sum\limits_{i=1}^N r_{ij}}=\frac
   <img src="./img/易受数据分布特性的影响改进.jpg" alt="易受数据分布特性的影响改进">
 </p>
 
-## 高斯混合模型
+## 高斯混合模型(GMM)
 
 ### 数据点与高斯分布
 
@@ -2372,11 +2372,294 @@ $$p(x)=\sum\limits_{i=1}^k \alpha_iN(x|\mu_i,\sum_i) \ , \ where \ \sum\limits_i
 
 - [x] 计算后验概率进行簇的判别
 
+### 算法流程
 
+- [x] 假设高斯混合模型分布参数已知，计算后验概率分布判断每个样本的类别
+  > - 对于训练集 $D$ ，令随机变量 $z_j \in \lbrace 1,2,\dots ,k\rbrace$ 表示样本 $x_j$ 属于哪个高斯分量，根据贝叶斯定理, $z_j$ 的后验概率分布如下:
 
-## 密度聚类
+$$p_{\mathcal{M}}(z_j=i|x_j)=\frac{P(z_j=i)·P_{\mathcal{M}}(x_j|z_j=i)}{p_{\mathcal{M}}(x_j)}=\frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{l=1}^k \alpha_l · p(x_j|\mu_l,\sum_l)}=\gamma_{ji}$$
+
+> - 注解：
+> - $P_{\mathcal{M}}(x_j|z_j=i)$ 为似然函数，指类别 $i$ 的水果重量为 $x_j$ 的概率
+> - $P(z_j=i)$ 为先验分布，每个类别所占比例，即混合系数 $α_i$
+> - $p_{\mathcal{M}}(x_j)$ 为边缘分布，指整个仓库中水果重量为 $x_j$ 的概率
+
+- [x] 对于样本 $x_j$ ，依据后验概率分布 $\lbrace \gamma_{ji} \rbrace_{i=1}$ ，最大概率进行簇的判别
+
+#### 高斯混合模型分布参数求解
+  > - [ ] GMM的参数 $\theta$ 包括：
+  > > - $\theta = \lbrace(\alpha_i,\mu_i,\sum_i)|1 \leq i \leq k\rbrace$
+  > > - $\alpha_i$ ：混合系数
+  > > - $\mu_i$ ：高斯分布的均值
+  > > - $\sum_i$ ：高斯分布的方差
+  >
+  > - [ ] 采用最大似然方法估计参数：
+  > > - $\hat{\theta}=\underset{\substack{\theta}}{\arg\max} \prod\limits_{j=1}^N p(x_j|\theta)$
+
+##### 高斯混合模型分布参数求解：最大化对数似然函数
+
+- [x] 似然函数： $L(D)=\prod\limits_{j=1}^N p(x_j|\theta)=\prod\limits_{j=1}^N \sum\limits_{i=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)$
+
+- [x] 对数似然函数： $LL(D)=\log (\prod\limits_{j=1}^N p(x_j|\theta)) = \sum\limits_{j=1}^N \log (\sum\limits_{i=1}^k \alpha_i · p(x_j|\mu_i,\sum_i))$
+
+- [x] 求解 $μ_i$ ：
+  > - 求导 $\frac{\partial{LL(D)}}{\partial{\mu_i}}=0 \rightarrow \sum\limits_{j=1}^N \frac{\alpha_i · p(x_j|\mu_i,\sum_i)(x_j-\mu_i)}{\sum\limits_{i=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)}=0$
+  > - 解得 $\mu_i = \frac{\sum\limits_{j=1}^N \frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{i=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)} · x_j}{\sum\limits_{j=1}^N \frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{i=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)}} = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gamma_{ji}}$
+  > - 其中 $\gamma_{ji} = \frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{l=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)}$
+
+- [x] 求解 $\sum_i$
+  > - 求导 $\frac{\partial{LL(D)}}{\partial{\sum_i}}=0 \rightarrow \sum_i = \frac{\sum\limits_{j=1}^N \gamma_{ji}(x_j - \mu_i)(x_j - \mu_i)^T}{\sum\limits_{j=1}^N \gamma_{ji}}$
+  > - 具体推导过程：
+  > > - $LL(D)=\sum\limits_{j=1}^N \log \sum\limits_{i=1}^kp(z=i|x_j)\frac{p(x_j|\mu_i,\sigma_i)\alpha_i}{p(z=i|x_j)} = \sum\limits_{j=1}^N \log \sum\limits_{i=1}^kp(z=i|x_j)\frac{p(x_j|\mu_i,\sum_i)\alpha_i}{p(z=i|x_j)} \leq \sum\limits_{j=1}^N \sum\limits_{i=1}^kp(z=i|x_j) \log \frac{p(x_j|\mu_i,\sum_i)\alpha_i}{p(z=i|x_j)} \ (Jensen不等式)$
+  > > - $= \sum\limits_{j=1}^N \sum\limits_{i=1}^k \gamma_{ji} \log \frac{p(x_j|\mu_i,\sum_i)\alpha_i}{\gamma_{ji}}=\sum\limits_{j=1}^N \sum\limits_{i=1}^k \gamma_{ji} (\log{\alpha_i}-\log{\gamma_{ji}}+\log{p(x_j|\mu_i,\sum_i)})$
+  > > - 则 $\sum_i = \underset{\substack{\sum_i}}{\arg\max} \sum\limits_{j=1}^N \sum\limits_{i=1}^k \gamma_{ji} (\log{p(x_j|\mu_i,\sum_i)}) = \underset{\substack{\sum_i}}{\arg\max} \sum\limits_{j=1}^N \gamma_{ji} (\log{p(x_j|\mu_i,\sum_i)})$
+  > > - 那么 $\frac{\partial}{\partial{\sum_i}}(\sum\limits_{j=1}^N \gamma_{ji} (\log{p(x_j|\mu_i,\sum_i)})) = \sum\limits_{j=1}^N \gamma_{ji} \frac{\partial}{\partial{\sum_i}} \[\log{|\sum_i|} + (x_j-\mu_i)^T \frac{1}{\sum_i}(x _j-\mu _i)\] = \sum\limits _{j=1}^N \gamma _{ji} \[\frac{1}{\sum_i}-(x_j-\mu_i)(x_j-\mu_i)^T {\frac{1}{(\sum_i)^2}}\]$
+  > > - 偏导为 $0$ ，两端乘 $\sum_i$
+  > > - $\sum\limits_{j=1}^N\gamma_{ji}\[\sum_i-(x_j-\mu_i)(x_j-\mu_i)^T\]=0$
+
+#### 结果分析
+
+$$\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gamma_{ji}}$$
+
+> - 均值：在该簇中依据后验概率进行样本值的加权平均
+
+$$\sum_i = \frac{\sum\limits_{j=1}^N \gamma_{ji}(x_j - \mu_i)(x_j - \mu_i)^T}{\sum\limits_{j=1}^N \gamma_{ji}}$$
+
+> - 方差：在该簇中依据后验概率进行样本方差的加权平均
+
+$$\alpha_i = \frac{1}{N} \sum\limits_{j=1}^N \gamma_{ji}$$
+
+> - 混合系数：所有样本属于该类的概率的平均值
+
+#### 算法流程
+
+- [x] 初始化参数 $\theta = \lbrace(\alpha_i,\mu_i,\sum_i)|1 \leq i \leq k\rbrace$
+  > - Do
+  > > - 计算每个样本分配的后验概率分布 $\gamma_{ji} = \frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{l=1}^k \alpha_i · p(x_j|\mu_i,\sum_i)}$
+  > > - 根据公式更新参数
+  > > - $\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gamma_{ji}},\sum_i = \frac{\sum\limits_{j=1}^N \gamma_{ji}(x_j - \mu_i)(x_j - \mu_i)^T}{\sum\limits_{j=1}^N \gamma_{ji}},\alpha_i = \frac{1}{N} \sum\limits_{j=1}^N\gamma_{ji}$
+  > - $Until \ 收敛$ (更新前后参数的变化量小于一定阈值)
+
+#### 参数求解也可以用 $EM$ 算法：一种针对仅有部分观测数据的通用框架
+
+- [x] “全部”数据包括样本 $\lbrace x_j \rbrace$ 和分配 $\lbrace z_j \rbrace$ ， $z_j$ 是未知/无法观测的，称为隐变量
+- [x] `EM算法` 分为 `Expectation` 和 `Maximization` 两步，重复执行直至收敛
+
+> - `Expectation` ：基于现有参数，计算隐变量的概率分布，根据概率分布计算目标函数的期望(Expectation)，消除隐变量
+> > -  对数似然: $LL(x,z)=\sum\limits_{j=1}^N\log (\sum\limits_{i=1}^k I(z_j=i)\alpha_i·p(x_j|\mu_i,\sum_i)) \geq \sum\limits_{j=1}^N\sum\limits_{i=1}^k I(z_j=i) \log (\alpha_i·p(x_j|\mu_i,\sum_i))$
+> > > - 不等式的右侧，选择此对数似然下界 $Q(x,z)$ 作为优化目标：
+> > > > - 1、增大这个下界就能够增大似然
+> > > > - 2、将 $z$ 和 $x$ 从 $log$ 计算中分离，以便后续 $z$ 的消除
+> >
+> > - 其中指示函数(指示 $x_j$ 的标签 $z_j$ 是否是第 $i$ 类)：
+
+$$I(z_j=i)=\begin{cases}
+1 , z_j = i \newline
+0 , z_j \not = i
+\end{cases}$$
+
+> > - 已知指示函数的期望: $E(I(z_j=i))=\gamma_{ji}$
+> > - 求得目标函数的期望: $E_{z \sim \gamma}(Q(x,z))=\sum\limits_{j=1}^N\sum\limits_{i=1}^k \gamma_{ji}\log (\alpha_i · p(x_j|\mu_i,\sum_i)) \rightarrow 未知的隐变量z_j被消除$ 
+
+> - Maximation：最大化(Maximation)目标函数的期望，更新参数
+> > - 最大化 $E_{z \sim \gamma}(Q(x,z))=\sum\limits_{j=1}^N\sum\limits_{i=1}^k \gamma_{ji}\log (\alpha_i · p(x_j|\mu_i,\sum_i))$
+> > - 由这个目标函数推导的参数的更新公式和前面推导的更新公式是一致的，即
+
+$$\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gamma_{ji}},\sum_i = \frac{\sum\limits_{j=1}^N \gamma_{ji}(x_j - \mu_i)(x_j - \mu_i)^T}{\sum\limits_{j=1}^N \gamma_{ji}},\alpha_i = \frac{1}{N} \sum\limits_{j=1}^N\gamma_{ji}$$
+
+- [x] `EM算法` 每次更新取最优解。是一种贪心算法。
+
+### GMM与K-means
+
+- [x] `K-means` 是 `GMM` 的特例，记参数为 $\lbrace(\alpha_i,\mu_i,\sum_i)\rbrace$
+  > - 令 $\alpha_i = \frac{1}{k},\sum_i=\sigma I$ ， $\sigma$ 是被所有分量共享的方差参数， $\sigma → \rightarrow 0$ ，限定 $\gamma_{ji}$ 只能等于 $0$ 或 $1$
+  > - $GMM初始化参数\lbrace(\alpha_i,\mu_i,\sum_i)\rbrace \leftrightarrow K-means初始化聚类中心μ_i(\alpha_i,\sum_i是定值)$
+  > - $GMM计算后验概率\gamma_{ji} \leftrightarrow K-means距离最近的类的\gamma_{ji}最大$
+  > > - $\gamma_{ji} = p_{\mathcal{M}}(z_j=i|x_j)=\frac{P(z_j=i)·P_{\mathcal{M}}(x_j|z_j=i)}{p_{\mathcal{M}}(x_j)}=\frac{\alpha_i · p(x_j|\mu_i,\sum_i)}{\sum\limits_{l=1}^k \alpha_l · p(x_j|\mu_l,\sum_l)}=\gamma_{ji}=\frac{\frac{1}{k}·e^{-\frac{||x_j-\mu_i||^2}{2\sigma}}}{\sum\limits_{l=1}^k\frac{1}{k}·e^{-\frac{||x_j-\mu_i||^2}{2\sigma}}}$ ， $||x_j-\mu_i||^2$ 最小的项的后验概率值是最大的。同时 $\sigma → \rightarrow 0$ 相当于对 $\gamma_{ji}$ 进行了二值化，只保留最大的为 $1$ ，其余为 $0$ 
+  > >  
+  > - $GMM更新参数\lbrace(\alpha_i,\mu_i,\sum_i)\rbrace \leftrightarrow K-means更新聚类中心μ_i(\alpha_i,\sum_i是定值)$
+
+- [x] 可以解释 `K-means` 的一些局限性
+  > - $\alpha_i=\frac{1}{k}$ ：各分量比例相同，只适用于分布均衡的样本
+  > - $\sum_i = \sigma I$ ：方差各维度都一样，只能拟合圆形/球形分布
+
+- [x] `K-means`
+  > - 类型：硬分类，0-1判别
+  > - 基于距离，只适于圆形或球形数据分布
+  > - 对于不均衡的样本类别聚类效果不佳
+
+- [x] `Gaussian Mixture Model(GMM)`
+  > - 类型：软分类，概率分配
+  > - 基于高斯分布，可拟合椭圆或椭球形的数据
+  > - 通过混合参数考虑了各簇类的权重
+
+## 密度聚类(Density-basesd clustering)
+
+### 场景
+
+- [x] 国庆花坛
+  > - 国庆节，园丁在广场上用鲜花和绿草打造出了“欢度国庆”四个字。鲜花和绿草间都留下至少一米的空隙。现在需要大侄子将花和草回收进仓库，可大侄子是红绿色盲，如何能让他知道哪些是鲜花，哪些是绿草呢？
+  > - 从一个位置开始收，跟它连着的距离一米以内的，就摞在一起,一米以外的，再重新放一堆
+  > - 整理出三堆花盆，绿草盆摞在一起，“国”字花摞在一起，“庆”字花摞在一起
+
+### 概念(基于算法DBSCAN)
+
+- [x] $\epsilon -$ 邻域：对 $x_j \in D$ ,其 $\epsilon -$ 邻域包含样本集 $D$ 中与 $x_j$ 的距离不大于 $\epsilon$ 的样本，即 $N_{\epsilon}(x_j)=\lbrace x_i \in D|dist(x_i,x_j) ≤ \epsilon \rbrace$ 。
+
+- [x] 核心对象(core object): 若 $x_j$ 的 $\epsilon -$ 邻域至少包含 $MinPts$ 个样本，即 $|N_{\epsilon}(x_j)| \geq MinPts$ ，则 $x_j$ 是一个核心对象。
+  > - $MinPts$ 为最少样本量
+
+- [x] 样本空间中的样本，存在下列关系：
+  > - `密度直达` ：如果一个点在核心对象的半径区域内，那么这个点和核心对象称为密度直达，比如上图中的 $A$ 和 $B$ 、 $B$ 和 $C$ 等。
+  > - `密度可达` ：如果有一系列点 $p_1,\dots ,p_n$ ，满足 $p_i$ 和 $p_{i+1}$ 是密度直达，则这个系列中不直达的点称为密度可达，如 $A$ 和 $D$ 。
+
+- [x] `异常值(噪声点)` ：最终聚类完成以后，不属于任何簇(聚类结果)的值。
+
+<p align="center">
+  <img src="./img/密度可达.jpg" alt="示例">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+### $DBSCAN$ 算法步骤
+
+- [x] 数据初始化：给定 `半径` 和 `最少样本量` ，寻找 `核心对象` 
+
+- [x] 如设最少样本量为6， $A、B、C$ (如上图所示)为核心对象
+
+- [x] 从样本集中随机抽取一个核心对象：
+  > - 从该点出发，找到所有密度可达对象，构成一个簇
+  > - 不断重复该过程，直到所有点都被处理过。
+
+- [x] 聚类结果
+  > - 样本点变成一个个连通区域，其中每一个区域就是获得的一个聚类结果
+
+### DBSCAN优点与缺点
+
+- [x] 优点:
+  > - 不需人为划分簇个数，可以通过计算过程自动分出。
+  > - 可处理噪声点，距离较远的数据不会被记入任何簇中，成为噪声点。
+  > - 可处理任意形状空间聚类问题。
+
+- [x] 缺点:
+  > - 需指定 `最小样本量MinPts` 和 `半径ε` 两个参数，并且十分敏感。
+  > - 数据量大时开销大，收敛时间长。
+  > - 样本集密度不均匀，聚类间距相差很大时，质量较差。
 
 ## 层次聚类
+
+### 两种策略
+
+- [x] 自底向上：簇合井，每层选择距离最近的两个簇合并成新簇
+
+- [x] 自顶向下：簇分割，每层保证分割后的两个簇距离最远
+
+- [x] 本章只介绍自底向上方法： `Agglomerative Nesting(AGNES)`
+
+### $AGNES$
+
+#### 树形图
+
+- [x] 根据树形图的层数进行簇类个数 $K$ 的划分
+
+- [x] 需要计算簇之间的距离进行簇的选择
+  > - 依据不同簇的样本间距离
+
+<p align="center">
+  <img src="./img/依据不同簇的样本间距离.png" alt="依据不同簇的样本间距离">
+</p>
+
+> - `Single-Link` ：最近点的距离，可能会产生链式效应，出现非常大的簇
+> - `Comnlete-Link` ：最远点的距离，避免链式效应，对离群点非常敏感
+> - `Average-Link` ：平均距离，上述方案的折中
+
+#### 构建树形图
+
+- 1、初始时每个样本为一个 `cluster` ，计算 `cluster` 之间的距离矩阵 $D$
+- 2、遍历距离矩阵 $D$ ，找出最小距离的 `cluster` ，将其进行合并，并更新距离矩阵 $D$
+- 3、重复2，直至最终只剩一个 `cluster`
+
+#### $ACNES$ 的影响因子
+
+- [x] 树形图的层数影响簇类个数 $K$ 的划分
+
+- [x] 距离准则的影响
+
+## 总结
+
+- [x] 不同聚类方法的比较
+
+<div align="center">
+  <table>
+  <thead>
+    <tr>
+      <th>聚类方法</th>
+      <th>原理</th>
+      <th>算法</th>
+      <th>聚类形状</th>
+      <th>算法效率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>k-means(1967)</td>
+      <td>基于距离</td>
+      <td>贪心算法</td>
+      <td>球形</td>
+      <td>很高</td>
+    </tr>
+    <tr>
+      <td>GMM(1997)</td>
+      <td>基于分布</td>
+      <td>EM算法</td>
+      <td>椭球形</td>
+      <td>一般</td>
+    </tr>
+    <tr>
+      <td>DBSCAN(1996)</td>
+      <td>基于密度</td>
+      <td>簇传播</td>
+      <td>任意形状</td>
+      <td>一般</td>
+    </tr>
+    <tr>
+      <td>AGNES(1973)</td>
+      <td>基于层次</td>
+      <td>簇聚合</td>
+      <td>任意形状</td>
+      <td>较差</td>
+    </tr>
+  </tbody>
+  </table>
+</div>
+<br>
+
+## 拓展 Clustering by fast search and find of density (Science 2014)
+
+### 核心思想
+
+- [x] 核心思想：
+  > - 聚类中心的局部密度高
+  > - 它们与任何具有较高局部密度的点之间的距离都相对较大
+
+- [x] 根据样本间距离 $d_{ij}$ 计算相关变量：
+  > - 样本点 $i$ 的局部密度 $\rho_i = \sum_j u(d_{ij}-d_c)$
+  > > - $\rho_i$ 等价于点 $i$ 的 $d_c$ 半径内的点的数量
+  > > - 其中对于 $x<0,u(x)=1$ ;对于 $x>0,u(x)=0$ ， $d_c$ 是截止距离(类似密度聚类的半径)
+
+- [x] 样本点 $i$ 到密度更高点的距离 $\delta_i = \min\limits_{j:\rho_j > \rho_i}(d_{ij})$ ,
+  > - $\delta_i$ 是点 $i$ 和具有更高密度的点之间的最小距离
+  > - 对密度最高的样本点定义为最远距离 $\delta_i = \max\limits_{j}(d_{ij})$
+
+### 案例展示
+
+- [x] (A).二维空间中的原始样本点分布，(B)根据 $\rho_i$ 和 $\delta_i$ 特征所作的点分布图：
+  > - $\delta_i$ 异常大的点 → 聚类中心
+  > - 剩余点被分配给密度较高的最近聚类邻点相同的类等 → 分配到与该点同类
+  > - 具有较高的类距离 $\delta_i$ 和较低的密度 $\rho_i$ → 可被认为是由单个点组成的集群，即异常值
+
+<br>
 
 # 第七章 深度学习:神经网络
 
