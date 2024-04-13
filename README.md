@@ -2633,7 +2633,6 @@ $$\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gam
   </tbody>
   </table>
 </div>
-<br>
 
 ## 拓展 Clustering by fast search and find of density (Science 2014)
 
@@ -2658,6 +2657,294 @@ $$\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gam
   > - $\delta_i$ 异常大的点 → 聚类中心
   > - 剩余点被分配给密度较高的最近聚类邻点相同的类等 → 分配到与该点同类
   > - 具有较高的类距离 $\delta_i$ 和较低的密度 $\rho_i$ → 可被认为是由单个点组成的集群，即异常值
+
+<br>
+
+# 第五章 降维
+
+## 降维概述
+
+### 维度
+- [x] 什么是维度
+  - 在机器学习领域，维度一般指的是样本属性的数量
+  - 比如，在做分类任务时，一般会利用属性将样本转化为向量，再进行后续分类操作
+
+<div align="center">
+  <table>
+  <thead>
+    <tr>
+      <th>身高</th>
+      <th>体重</th>
+      <th>发长</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>175</td>
+      <td>65</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+  </table>
+</div>
+
+> - 抽象成向量(175,65,6)(三维数据)
+
+### 高维数据的问题
+
+- [x] 但在实际任务中引入过多属性，即维数过高，往往会引发一系列问题
+
+$$
+\textcolor{blue}{高维数据引发问题}\begin{cases}
+\textcolor{purple}{引入无效属性} \newline
+\textcolor{green}{导致样本稀疏} \newline
+\textcolor{pink}{计算复杂} \newline
+\end{cases}
+$$
+
+#### 问题1 高维数据可能会引入无效属性
+
+- [x] 现有数据属性：身高、体重、腿长、籍贯、出生日期、体脂率、所学专业
+  - 目标：利用这些属性实现男女性别分类
+  - 所有属性都有用吗？存储所有属性是否会造成空间浪费？
+  - 也可以做属性选择,但很多时候并不清楚哪些属性有用
+
+#### 问题2 高维数据会使样本变稀疏
+
+<p align="center">
+  <img src="./img/问题2 高维数据会使样本变稀疏.jpg" alt="问题2 高维数据会使样本变稀疏">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+> - 保持样本点数量不变，维度越高，样本在维度空间中变得越来越稀疏
+
+### 维数灾难
+
+- [x] 事实上，在高维情形下出现的数据样本稀疏、距离计算困难等问题是所有机器学习方法所面临的共同障碍，这就是机器学习领域的“ $\textcolor{red}{维数灾难}$ ”
+
+<p align="center">
+  <img src="./img/维数灾难.jpg" alt="维数灾难">
+</p>
+
+> - 维数灾难是一个最早由美国应用数学家理查德·贝尔在考虑优化问题时首次提出来的术语，用来描述当(数学)几何维度增加时，分析和组织高维空间。
+
+### 降维流程
+
+- [x] 为了选择有效属性、缓解维数灾难，一个重要的途径就是 `降维`
+
+- [x] 在统计学、机器学习中，降维是通过某种特定映射变换处理，将 $m$ 维数据降为 $d$ 维的过程，其中 $m > d$ 。
+
+## 主成分分析(Principal Component Analysis)
+
+### 问题动机
+
+<p align="center">
+  <img src="./img/问题动机.png" alt="问题动机">
+</p>
+
+> - 数据样本不同维度之间有相关性，难以判断哪些属性更加重要 $\rightarrow \textcolor{red}{去相关}$
+> - 为了实现 `去相关` ，可以寻求一个线性变换，使得各个维度之间没有相关性
+> - 不同维度的重要性排序，保留重要的维度，舍弃次要维度，实现降维
+
+
+### 思路流程
+
+<p align="center">
+  <img src="./img/降维思路流程.jpg" alt="降维思路流程">
+</p>
+
+- [x] 零均值化：为了便于推导计算，通常将数据每个维度减去该维度的均值 $X-\overline{X}$
+
+- [x] 去相关：寻求一个变换矩阵 $W^T$ ，使得 $Y=W^T(X-\overline{X})$ 各维之间数据没有相关性
+
+- [x] 降维：保留主要维度，舍弃掉次要维度，实现降维
+
+#### 去相关
+
+- [x] 相关性的度量：相关性系数 $\rho = \frac{Cov(a,b)}{\sqrt{D(a)}\sqrt{D(b)}}$ ，分子(协方差)为零，则相关系数为零
+  - $Cov(a, b)= E[(a-E(a))(b-E(b))]= E(ab)-E(a)E(b)$
+
+- [x] 为了度量多个维度间的相关性，引入协方差矩阵。 $n$ 个$m$ 维的数据形成矩阵 $X_{m×n}$ ，协方差矩阵： $\frac{1}{n}(X- \overline{X})(X- \overline{X})^T$ (零均值化处理，方便运算推导)。
+  - 例如这里有 $3$ 维数据 $4$ 个样本
+
+$$
+X-\overline{X}=\left(\begin{matrix}
+a_1 \ a_2 \ a_3 \ a_4 \newline
+b_1 \ b_2 \ b_3 \ b_4 \newline
+c_1 \ c_2 \ c_3 \ c_4 \newline
+\end{matrix}\right)
+$$
+
+$$
+\frac{1}{4}(X- \overline{X})(X- \overline{X})^T=\left(\begin{matrix}
+\frac{1}{4}\sum\limits_{i=1}^4a_i^2 \ \frac{1}{4}\sum\limits_{i=1}^4a_ib_i \ \frac{1}{4}\sum\limits_{i=1}^4a_ic_i \newline
+\frac{1}{4}\sum\limits_{i=1}^4b_ia_i \ \frac{1}{4}\sum\limits_{i=1}^4b_i^2 \ \frac{1}{4}\sum\limits_{i=1}^4b_ic_i \newline
+\frac{1}{4}\sum\limits_{i=1}^4c_ia_i \ \frac{1}{4}\sum\limits_{i=1}^4c_ib_i \ \frac{1}{4}\sum\limits_{i=1}^4c_i^2 \newline
+\end{matrix}\right) = \left(\begin{matrix}
+cov(a,a) \ cov(a,b) \ cov(a,c) \newline
+cov(b,a) \ cov(b,b) \ cov(b,c)\newline
+cov(c,a) \ cov(c,b) \ cov(c,c)\newline
+\end{matrix}\right)
+$$
+
+- [x] 如果我们能够找到一个线性变换 $W^T$ ，经过 $Y=W^T(X-\overline{X})$ 变换之后，使得 $Y$ 各个维度之间没有相关性，即 $Y$ 的协方差矩阵为对角阵
+
+$$
+\frac{1}{n}YY^T=\left(\begin{matrix}
+\lambda_1 \ 0 \ \dots \ 0 \newline
+0 \ \lambda_2 \ \dots \ 0 \newline
+\vdots \ \ddots \ \vdots \ \vdots \newline
+0 \ 0 \ \dots \ \lambda_m \newline
+\end{matrix}\right)
+$$
+
+- [x] 这样在 $W^T$ 线性变化之下，就实现了对原始数据的去相关
+  - 如何去求 $w^T$
+
+- [x] 变换矩阵记为矩阵 $W^T$ ，则变换后的数据矩阵可以记为： $Y=W^T(X-\overline{X})$
+
+- [x] 因此 $Y$ 的协方差矩阵为
+
+$$\frac{1}{n}YY^T=\frac{1}{n}W^T(X-\overline{X})(W^T(X-\overline{X}))^T=\frac{1}{n}W^T(X-\overline{X})(X-\overline{X})^TW=W^T(\frac{1}{n}(X-\overline{X})(X-\overline{X})^T)W$$
+
+> - 找到 $W$ ，实现对上 $\frac{1}{n}(X-\overline{X})(X-\overline{X})^T$ 的对角化 $\rightarrow$ $Y$ 的协方差矩阵对角化
+
+##### 如何找到变换矩阵 $W^T$
+
+- [x] 对 $\frac{1}{n}(X-\overline{X})(X-\overline{X})^T$ (对称矩阵)进行特征值分解，得到特征向量，将这些特征向量组合起来形成 $W$ ，发现这样产生的 $W^T$ 刚好是我们要寻找的变换矩阵。
+  - <a href="https://blog.csdn.net/Scotfield_msn/article/details/54576987"><kbd>矩阵的特征值和特征向量</kbd></a>
+
+$$(\frac{1}{n}(X-\overline{X})(X-\overline{X})^T) × w_i = \lambda_iw_i,i=1,2,\dots,m$$ 
+
+> 特征值分解，得到特征向量
+
+$$W = (w_1,w_2,\dots,w_m)$$
+
+> W是标准正交矩阵 $\rightarrow W^T=W^{-1}$
+
+$$
+W^T(\frac{1}{n}(X-\overline{X})(X-\overline{X})^T)W=\left(\begin{matrix}
+\lambda_1 \ 0 \ \dots \ 0 \newline
+0 \ \lambda_2 \ \dots \ 0 \newline
+\vdots \ \ddots \ \vdots \ \vdots \newline
+0 \ 0 \ \dots \ \lambda_m \newline
+\end{matrix}\right)
+$$
+
+> 因此 $W^T$ 就是我们要找的线性变换
+
+#### 降维
+
+- [x] 因此，经过 $Y=W^T(X-\overline{X})$ 变换后， $Y$ 各维度间不存在相关性,我们可以舍弃一些维度来实现降维
+  - 应该舍弃哪些维度呢？
+
+- [x] 几何意义:一般情况
+
+<p align="center">
+  <img src="./img/几何意义一般情况.jpg" alt="几何意义:一般情况">
+  <p align="center">
+   <span>几何意义:一般情况</span>
+  </p>
+</p>
+
+##### 信息损失分析
+
+- [x] 重构误差是数据在丢掉维度上的方差
+
+- [x] 所以可以舍弃方差最小的维度，这样就可以实现 `最小均方误差意义下的降维`
+
+$$
+\frac{1}{n}YY^T=\left(\begin{matrix}
+\lambda_1 \ 0 \ \dots \ 0 \newline
+0 \ \lambda_2 \ \dots \ 0 \newline
+\vdots \ \ddots \ \vdots \ \vdots \newline
+0 \ 0 \ \dots \ \lambda_m \newline
+\end{matrix}\right)
+$$
+
+<p align="center">
+  <img src="./img/信息损失分析.jpg" alt="信息损失分析">
+</p>
+
+> - 所以，在只使用前 $d$ 个特征向量的情况下, $x_i$ 与其逆 `PCA` 重构 $x_i'$ 之间的均方误差为:
+
+$$\frac{1}{n}\sum\limits_{i=1}^n||x_i-x_i'||^2=\sum\limits_{j=d+1}^m\lambda_j$$
+
+### 算法流程
+
+- [x] $\textcolor{red}{输入}$ ：①给定样本集 $X_{m×n}$ ②降维的目标维数 $d$
+
+- [x] $\textcolor{red}{过程}$ :
+  - 对输入数据进行零均值化，即减去均值 $X-\overline{X}$
+  - 计算协方差矩阵 $\frac{1}{n}(X-\overline{X})(X-\overline{X})^T$
+  - 求出协方差矩阵的特征值及对应的特征向量，将特征值由大到小排序
+  - 取最大的 $d$ 个特征值所对应的特征向量 $w_1,w_2,\dots ,w_d$
+
+- [x] $\textcolor{red}{输出}$ ：
+  - 由此得到降维矩阵： $W'=(w_1,w_2,\dots ,w_d)$
+  - 降维结果： $Y=W^T(X-\overline{X})$
+
+#### 示例
+
+<p align="center">
+  <img src="./img/降维PCA示例.jpg" alt="降维PCA示例">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+##### 变换与重构
+
+<p align="center">
+  <img src="./img/变换与重构.jpg" alt="变换与重构">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+### PCA在人脸识别的应用
+
+```mermaid
+graph LR
+A[原图200×200]-->|提取灰度特征|B(原始特征将达到40000维)
+B-->|PCA处理,例如取200个主成分|C[降维后可以在最小均方误差下重建人脸]
+```
+
+- [x] 思路梳理
+  - 数据预处理：将每一张人脸拉成一个列向量，所有人脸构成一个矩阵，每列是一张脸。
+  - 求平均脸：对每一行都求平均值，得到一个列向量，我们称之为“平均脸”。
+  - 样本中心化：每一个脸都减去平均脸。
+  - 对中心化后的样本，求协方差矩阵的特征向量。每一个特征向量都是一个主成分，称之为“特征脸”。
+
+<p align="center">
+  <img src="./img/PCA在人脸识别的应用.jpg" alt="PCA在人脸识别的应用">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
+
+## 局部线性嵌入(LLE)
+
+- [x] 局部线性
+  - 局部线性的含义是整个数据集的局部范围内，数据符合线性关系
+
+<p align="center">
+  <img src="./img/局部线性.jpg" alt="局部线性">
+  <p align="center">
+   <span>局部线性</span>
+  </p>
+</p>
+
+- [x] **LLE保留数据原有局部线性关系**
+
+<p align="center">
+  <img src="./img/LLE保留数据原有局部线性关系.jpg" alt="LLE保留数据原有局部线性关系">
+  <p align="center">
+   <span>示例</span>
+  </p>
+</p>
 
 <br>
 
@@ -3322,6 +3609,8 @@ $$loss=L(y,l)$$
 > - 降低过拟合:在深度学习中，模型如果过于复杂，容易发生过拟合现象。 `Dropout` 可以随机关闭一部分神经元，使得每次网络的拓扑结构都会发生变化，从而减少网络的复杂度,降低过拟合。
 > - 提高泛化能力:通过 `Dropout` ，模型输入不依赖某些特定的神经元，从而提高模型的泛化能力，增强模型鲁棒性。
 
+<br>
+
 # 第八章 视觉识别
 
 ## 视觉表征
@@ -3621,4 +3910,436 @@ G --> |循环直到输出深度语义表征| F
   <img src="./img/RelU激活函数.jpg" alt="RelU激活函数">
 </p>
 
+#### VGG
+
+- [x] 使用更小的卷积核窗口和更深的网络结构，取得了2014年ILSVRC竞赛的 `第二名` 。
+    - 全部使用 $3×3$ 卷积核(步长1、填充1)，和2×2池化核(步长2、填充0);
+    - 网络层数：8层→16层或19层；
+
+- [x] **AlexNet的缺陷** ：使用较大的卷积核(例如 $11×11$ 和 $5×5$ 的)去增大感受野，获取更大范围的图片信息，但模型参数量较大。
+
+<p align="center">
+  <img src="./img/VGG1.jpg" alt="VGG">
+</p>
+
+##### VGG的改进：小卷积核的叠加
+
+- [x] 使用多个更小的卷积核(例如 $3×3$ 的)的叠加来代替大卷积核。
+
+- [x] 问题：为什么可以使用更小的卷积核( $3×3$ )？
+    - 回答：堆叠2个 $3×3$ 的卷积层和1个 $5×5$ 的卷积层具有相同的感受野，3个 $3×3$ 的卷积层和1个 $7×7$ 的卷积层具有相同的感受野，但网络结构更深，参数量更小。
+
+<p align="center">
+  <img src="./img/VGG2.jpg" alt="VGG">
+</p>
+
+##### VGG：3×3感受野的叠加 vs 7×7感受野
+
+- [x] 可以看出，3个 $3×3$ 的卷积层堆叠之后的感受野范围( $\textcolor{blue}{蓝色框}$ )，和一个 $7×7$ 的卷积层相同。
+    - 一个 $7×7$ 卷积核参数量为： $7×7= 49$
+    - 三个 $3×3$ 卷积核参数量为： $3×(3×3)= 27$ ，参数量减为原来的55%。
+
+<p align="center">
+  <img src="./img/VGG3.jpg" alt="VGG">
+</p>
+
+##### VGG-16:中间变量细节
+
+> - 全部使用 $3×3$ 卷积核(步长1、填充1)和 $2×2$ 池化核(步长2)
+
+<div align="center">
+  <table>
+  <thead>
+    <tr>
+      <th>模型结构名称</th>
+      <th>输出尺寸</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td>224×224×3(原图)</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3(为卷积核尺寸)-64(为卷积核个数)</td>
+      <td>224×224×64</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-64</td>
+      <td>224×224×64</td>
+    </tr>
+    <tr>
+      <td>MaxPool-2×2(池化核尺寸)</td>
+      <td>112×112×64</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-128</td>
+      <td>112×112×128</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-128</td>
+      <td>112×112×128</td>
+    </tr>
+    <tr>
+      <td>MaxPool-2×2</td>
+      <td>56×56×128</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-256</td>
+      <td>56×56×256</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-256</td>
+      <td>56×56×256</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-256</td>
+      <td>56×56×256</td>
+    </tr>
+    <tr>
+      <td>MaxPool-2×2</td>
+      <td>28×28×256</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>28×28×512</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>28×28×512</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>28×28×512</td>
+    </tr>
+    <tr>
+      <td>MaxPool-2×2</td>
+      <td>14×14×512</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>14×14×512</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>14×14×512</td>
+    </tr>
+    <tr>
+      <td>Conv-3×3-512</td>
+      <td>14×14×512</td>
+    </tr>
+    <tr>
+      <td>MaxPool-2×2</td>
+      <td>7×7×512(25088)</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>4096</td>
+    </tr>
+    <tr>
+      <td>FC-25088-4096</td>
+      <td>4096</td>
+    </tr>
+    <tr>
+      <td>FC-4096-4096</td>
+      <td>1000</td>
+    </tr>
+    <tr>
+      <td>FC-4096-1000</td>
+      <td>1000(类别概率)</td>
+    </tr>
+  </tbody>
+  </table>
+</div>
+<br>
+
+> - 参数总量 $128M$
+
+<p align="center">
+  <img src="./img/VGG4.jpg" alt="VGG">
+</p>
+
+##### VGG的缺陷
+
+- [x] 网络每一层的卷积核尺度是固定的，无法捕获多尺度的空间信息，无法学习多尺度的视觉特征。
+
+- [x] 随着网络层数增多，网络的参数量和计算量急剧增大(特别是全连接层)，效率太低。
+
+- [x] 问题：如何学习多尺度的视觉特征？
+    - 回答：同时使用不同尺寸的卷积层和池化层。
+
+<p align="center">
+  <img src="./img/VGG5.jpg" alt="VGG">
+</p>
+
+#### GoogLeNet
+
+- [x] 2014年提出并取得了当年ILSVRC竞赛的 `第一名` ，使用更深的网络，但更高的计算效率。
+    - 网络层数有22层，但参数量是AlexNet的 $\frac{1}{12}$ (8层)，VGG16的 $\frac{1}{27}$ (16层)；
+    - 同时使用不同尺寸的卷积层，引入融合不同尺度特征信息的 `Inception` 模块；
+    - 没有使用全连接层，全是卷积层和池化层。
+
+##### GoogLeNlet: Inception模块
+
+- [x] 包含多个不同感受野大小的卷积操作，使用拥有不同感受野的 $1×1$ 、 $3×3$ 、 $5×5$ 的卷积层，再加上 $3×3$ 的池化层，并在通道维度上拼接起来作为输出特征映射，使得学习到的特征能融合不同尺度的空间信息。
+    - 但带来一个问题：在同一层使用多个不同尺寸的卷积核会导致计算量过大。
+
+<p align="center">
+  <img src="./img/原始的Inception模块.jpg" alt="原始的Inception模块">
+  <p align="center">
+   <span>原始的Inception模块</span>
+  </p>
+</p>
+
+##### GoogLellet：原始的Inception模块计算实例
+
+<p align="center">
+  <img src="./img/原始的Inception模块计算实例.jpg" alt="原始的Inception模块计算实例">
+</p>
+
+- [x] 解决方案：加入“ `Bottleneck Layer` ”，使用 $1×1$ 的卷积核减少特征图的通道数量(特征降维)，从而减少计算量，提升计算效率。
+
+##### GoogLellet：整体结构
+
+- [x] GoogLeNet大量使用了改进的Inception模块，相比原始的结构， `额外` 加入了3个 $1×1$ 的 `卷积层` 。
+
+<p align="center">
+  <img src="./img/GoogLellet：整体结构.jpg" alt="GoogLellet：整体结构">
+  <p align="center">
+   <span>GoogLellet：整体结构</span>
+  </p>
+</p>
+
+##### GoogLeNet：1×1卷积
+
+- [x] $1×1$ 卷积保持特征图的空间维度不变，但可以减少通道维度大小，因此 `Inception` 模块引入 $\textcolor{cyan}{3个额外的1×1卷积层}$：
+
+<p align="center">
+  <img src="./img/1×1卷积.jpg" alt="1×1卷积">
+</p>
+
+##### GoogLeNet：改进的Inception模块计算实例
+
+<p align="center">
+  <img src="./img/改进的Inception模块计算实例.jpg" alt="改进的Inception模块计算实例">
+</p>
+
+> 可以看出，加入“ $\text{purple}{Bott \ leneck \ Layer}$ ”能极大地提高计算效率。
+
+##### GoogLeNet：其他细节
+
+- [x] 使用全局平均池化(global average pooling)代替网络最后的全连接层输出，减少参数量。
+
+- [x] 网络的参数总量约为5M， 是AIexNet的 $\frac{1}{12}$ (参数约为 $60M$ )，VGG16的 $\frac{1}{27}$ （参数约为 $138M$ )。
+
+- [x] 在之后的改进版本中，引入了 $\textcolor{pink}{Batch \ Normalization}$ 层来加速网络收敛。
+
+<p align="center">
+  <img src="./img/GoogLeNet：其他细节.jpg" alt="GoogLeNet：其他细节">
+</p>
+
+#### ResNet
+
+- [x] 2015年提出并取得了当年ILSVRC的第一名，网络非常深（网络层数最少有18层，最多有152层），首次使用残差单元( `Residual block` )，给卷积层增加直连边(恒等映射层)，提高信息的传播效率。
+
+<p align="center">
+  <img src="./img/ResNet.jpg" alt="ResNet">
+  <p align="center">
+   <span>ResNet</span>
+  </p>
+</p>
+
+##### ResNet:(1)残差连接的性能收益
+
+- [x] 加入恒等映射层后，让原有的网络层拟合残差映射 $H(x)-x$ ，而不是直接拟合所需的映射 $H(x)$ ，这样网络结构变为 $H(x)= F(x)+x$ 。若可学习的残差映射 $F(x)=0$ 时，网络就只剩下恒等映射 $H(x)= x$ 。通过残差连接，模型更容易学到简单结构去拟合数据，降低模型的复杂度，保证深层网络性能不下降。
+
+<p align="center">
+  <img src="./img/残差连接的性能收益.jpg" alt="残差连接的性能收益">
+</p>
+
+##### Resllet:(2)残差连接的梯度
+
+- [x] 假设两层的网络级联，输入为 $x$ ，两层网络用 $f$ ， $g$ 表示，输出为 $g(f(x))$ 。
+
+- [x] 不加残差连接的梯度计算： $\frac{\partial{g(f(x))}}{\partial{x}} = \frac{\partial{g(f(x))}}{\partial{f(x)}} × \frac{\partial{f(x)}}{\partial{x}}$ ，由于梯度一般是大于0小于1的数，所以当网络层数
+不断增加时，总梯度容易接近0最后消失。
+
+- [x] 加入残差连接的梯度计算： $\frac{\partial{g(f(x)+x)}}{\partial{x}} = \frac{\partial{g(f(x)+x)}}{\partial{f(x)+x}} × (\frac{\partial{f(x)}}{\partial{x}}+1)$ ，可以看到加了残差后每层网络的梯度都是额外增加了一个恒等项“1”，因此即使很深的网络也不容易梯度消失。
+
+##### ResNet：整体结构
+
+- [x] 堆叠残差单元，每个残差单元有两个 $3×3$ 的卷积层;
+
+- [x] 周期性地，特征通道数翻倍、空间尺寸减小为一半;
+
+- [x]全连接层只在最后分类时使用了一次；
+
+- [x] 总共有 $18、34、50、101、152$ 层的网络可供选择,常用的 `ResNet-50` 的参数量约为 $25.5M$ 。
+
+<p align="center">
+  <img src="./img/ResNet：整体结构.jpg" alt="ResNet：整体结构">
+</p>
+
+##### ResNet:其他细节
+
+- [x] 对于更深层的网络结构(ResNet50以上），使用“ `bottleneck layer` ”提升计算效率(类似于GoogLeNet)，通过 $1×1$ 的卷积层减少特征图的通道数量，降低网络参数量和计算量。
+
+<p align="center">
+  <img src="./img/ResNet：其他细节.jpg" alt="ResNet：其他细节">
+</p>
+
+#### 典型深度卷积网络的对比
+
+- [x] (1) `AlexNet` ：第一个把卷积网络引入视觉识别任务，更小的计算量，但参数较多，性能较差;
+
+- [x] (2) `VGG` ：扩大网络结构，参数最多，计算量最大;
+
+- [x] (3) `GoogLeNet` ：首次专注于计算效率，设计 $1×1$ 卷积bottleneck，参数最少，计算效率最高;
+
+- [x] (4) `ResNet` ：给出训练特别深网络的解决方案,适中的计算效率，最好的性能。
+
+<p align="center">
+  <img src="./img/典型深度卷积网络的对比.jpg" alt="典型深度卷积网络的对比">
+</p>
+
+#### ResNet改进：SENet
+
+- [x] 增加一个特征重校准模块，自适应地学习特征图的加权值。
+
+- [x] 使用全局平均池化层和两个全连接层来构成特征重校准模块。
+
+> - 这种结构的原理是想通过学习加权值的大小，把网络中重要的特征图增强,不重要的特征图相对减弱，从而让输出特征图的分辨能力更强。
+
+<p align="center">
+  <img src="./img/SENet.jpg" alt="SENet">
+</p>
+
+#### ResNet改进：Wide ResNet
+
+- [x] 动机：ResNet的有效性来自残差单元，增加网络宽度比增加深度计算上效率更高，性能提升更多。
+
+- [x] 方法：使用更宽的残差单元，即增加卷积层的通道数目，把每层的卷积通道数提升 $K$ 倍。
+  - 50层的 `Wide ResNet` 和152层的 `ResNet` 性能相当,相同参数的 `Wide ResNet` 训练速度快于 `ResNet` 。
+
+<p align="center">
+  <img src="./img/Wide ResNet.jpg" alt="Wide ResNet">
+</p>
+
+#### ResNet改进：ResNeXt
+
+- [x] 通过添加多条平行路径来增加网络的宽度，单路卷积变成多支路的多路卷积，每条支路结构一致。
+
+- [x] ResNeXt-50( $\textcolor{red}{32×4d}$ )和ResNet-50拥有几乎相同的参数，但是性能却更高，但相应的推理速度更慢(多分支需要单独处理)。
+
+<p align="center">
+  <img src="./img/ResNeXt.jpg" alt="ResNeXt">
+</p>
+
+#### 后ResNet时期
+
+- [x] ResNet之后的深度卷积网络性能已经优于人类水平，研究重点转向到如何设计计算效率更高的网络，许多针对移动设备的轻量型网络被提出，例如MobileNet、ShuffleNet等。
+
+- [x] 神经网络架构搜索(Neural Architecture Search)：摆脱人工设计，自动进行网络架构的设计，寻找最优的网络范式。
+
+- [x] 抛弃卷积结构，使用transformer结构。
+
+> - https://openai.com/blog/ai-and-efficiency/
+
 ## 深度视觉网络训练
+
+### 模型训练策略
+
+<p align="center">
+  <img src="./img/模型训练策略.jpg" alt="模型训练策略">
+</p>
+
+#### 模型训练前：权重初始化
+
+- [x] 网络模型的参数需要设置初始值，初始值的选取影响后续的训练过程。
+  - 对于浅层网络，常用(均值为0，方差很小的)高斯分布作为随机初始化： $\mathcal{N}(0,\sigma )$ ， $\sigma$ 为超参数;
+  - 对于深层网络，方差与网络层的特征维度 $d$ 相关： $\mathcal{N}(0,\frac{\sigma}{\sqrt{d}})$ ，被称为 `Xavier` 初始化。
+
+<p align="center">
+  <img src="./img/模型训练前：权重初始化.jpg" alt="模型训练前：权重初始化">
+</p>
+
+#### 模型训练时：早期停止
+
+- [x] 为了提高模型的泛化性(新数据上的表现)，我们需要观察模型训练时在训练集和验证集上的性能变化。
+  - 当验证集的性能开始显著降低时，停止训练模型。
+  - 若训练时间很长，始终选择在验证集上效果最好的模型快照(checkpoint)作为最后需要的模型参数。
+
+<p align="center">
+  <img src="./img/模型训练时：早期停止.jpg" alt="模型训练时：早期停止">
+</p>
+
+#### 模型训练时：数据增强
+
+- [x] 为了提高训练数据集的多样性，对输入的图片进行裁剪、颜色抖动、水平翻转、高斯模糊等初等变换操作。通过对训练图像做一系列随机改变，来产生相似但又不同的训练样本，从而扩大训练数据集的规模，而且随机改变训练样本可以降低模型对某些属性的依赖，从而提高模型的泛化能力。
+
+#### 模型训练时：正则化
+
+- [x] 正则化是减小过拟合、提高模型泛化性的常用手段。
+  - **在损失函数上添加正则化项** ： $L=loss(W,x,y)+\lambda R(W)$ ，其中 $x,y$ 为输入数据和标签， $W$ 为模型参数；为了参数可导性，常使用 $L_2$ 正则项： $R(W)=\sum\limits_k\sum\limits_l ||W||^2, \frac{\partial{R(W)}}{2\partial{W}}=-W$ 。
+  - **网络模型加入 `Dropout` 层** ：每次前向传播时，会以一定概率丢弃神经网络中某些神经元节点及其与它的连接，从而使得每一个节点的权重不会过大，可以有效缓解过拟合现象。
+
+<p align="center">
+  <img src="./img/模型训练时：正则化.jpg" alt="模型训练时：正则化">
+</p>
+
+#### 模型训练后：模型集成
+
+- [x] 为了提升模型在测试集和推理时的性能，常常独立地训练多个相同的网络模型(例如，使用不同随机种子训练模型)，将输出结果平均后作为最后的输出，类似于机器学习中的集成学习( `ensemble learning` )。可以看作每个模型都不同的“观察角度”，汇聚在一起后可以得到对数据更加全面和准确的描述。
+
+<p align="center">
+  <img src="./img/模型训练后：模型集成.jpg" alt="模型训练后：模型集成">
+</p>
+
+#### 模型训练后：超参数选择
+
+- [x] 网格搜索( `gird search` )vs 随机搜索( `random search` )，前者适合三四个(或者更少)的超参数，当超参数的数量增长时，网格搜索的计算复杂度会呈现指数增长，这时候则使用随机搜索会很好。
+
+<p align="center">
+  <img src="./img/模型训练后：超参数选择.jpg" alt="模型训练后：超参数选择">
+</p>
+
+- [x] 超参数是模型训练前需要人为的进行调整的参数，包括网络参数(卷积核尺寸、网络层数)、优化参数(学习率、批样本数量、训练时间)等，超参数的选择就是寻找全局最优解的过程，常常依赖于模型在训练集和测试集上的性能变化来调整超参数。
+
+<p align="center">
+  <img src="./img/模型训练后：超参数选择1.jpg" alt="模型训练后：超参数选择">
+</p>
+
+> - 左图准确率持续提高，增长训练时间；中间图测试集和训练集间的性能有较大差距，需要增加正则化项；右侧测试集和训练集性能相似，欠拟合，需要增加网络层数。
+
+### 迁移学习
+
+- [x] 问题：当我们的数据规模很小、很独特,又想使用深度神经网络该怎么办？
+  - 回答：使用迁移学习策略，遵循预训练-微调(pretrain-finetune)的范式。
+
+<p align="center">
+  <img src="./img/迁移学习1.jpg" alt="迁移学习">
+</p>
+
+- [x] 迁移学习的策略：
+  > 1. 数据集越大，数据集差异越大，需要微调训练的层应该越多；
+  > 2. 微调的学习率应该比预训练的要更小;
+  > 3. 可以考虑微调网络所有的参数；
+  > 4. 可以在其他视觉识别任务上进行迁移。
+
+#### 迁移学习的局限性
+
+- [x] 迁移学习在计算机视觉领域是普遍的范式，但最近的一些研究结果表明，这可能并不总是必要的。
+
+- [x] 右图表示：从零开始的训练与从预训练的模型进行微调相比，如果训练的时间足够长，在目标检测上的性能趋于一致。
+
+- [x] 对于深度学习来说，收集更大量级的数据用于模型训练，对性能提升才是最有效的！(同时模型也要够大)
+
+<p align="center">
+  <img src="./img/迁移学习2.jpg" alt="迁移学习">
+</p>
+
+
+
+
+
+
