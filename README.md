@@ -2695,10 +2695,10 @@ $$\mu_i = \frac{\sum\limits_{j=1}^N \gamma_{ji} · x_j}{\sum\limits_{j=1}^N \gam
 - [x] 但在实际任务中引入过多属性，即维数过高，往往会引发一系列问题
 
 $$
-\textcolor{blue}{高维数据引发问题}\begin{cases}
-\textcolor{purple}{引入无效属性} \newline
-\textcolor{green}{导致样本稀疏} \newline
-\textcolor{pink}{计算复杂} \newline
+\color{blue}{高维数据引发问题}\begin{cases}
+\color{purple}{引入无效属性} \newline
+\color{green}{导致样本稀疏} \newline
+\color{pink}{计算复杂} \newline
 \end{cases}
 $$
 
@@ -2722,7 +2722,7 @@ $$
 
 ### 维数灾难
 
-- [x] 事实上，在高维情形下出现的数据样本稀疏、距离计算困难等问题是所有机器学习方法所面临的共同障碍，这就是机器学习领域的“ $\textcolor{red}{维数灾难}$ ”
+- [x] 事实上，在高维情形下出现的数据样本稀疏、距离计算困难等问题是所有机器学习方法所面临的共同障碍，这就是机器学习领域的“ $\color{red}{维数灾难}$ ”
 
 <p align="center">
   <img src="./img/维数灾难.jpg" alt="维数灾难">
@@ -2744,7 +2744,7 @@ $$
   <img src="./img/问题动机.png" alt="问题动机">
 </p>
 
-> - 数据样本不同维度之间有相关性，难以判断哪些属性更加重要 $\rightarrow \textcolor{red}{去相关}$
+> - 数据样本不同维度之间有相关性，难以判断哪些属性更加重要 $\rightarrow \color{red}{去相关}$
 > - 为了实现 `去相关` ，可以寻求一个线性变换，使得各个维度之间没有相关性
 > - 不同维度的重要性排序，保留重要的维度，舍弃次要维度，实现降维
 
@@ -2874,15 +2874,15 @@ $$\frac{1}{n}\sum\limits_{i=1}^n||x_i-x_i'||^2=\sum\limits_{j=d+1}^m\lambda_j$$
 
 ### 算法流程
 
-- [x] $\textcolor{red}{输入}$ ：①给定样本集 $X_{m×n}$ ②降维的目标维数 $d$
+- [x] $\color{red}{输入}$ ：①给定样本集 $X_{m×n}$ ②降维的目标维数 $d$
 
-- [x] $\textcolor{red}{过程}$ :
+- [x] $\color{red}{过程}$ :
   - 对输入数据进行零均值化，即减去均值 $X-\overline{X}$
   - 计算协方差矩阵 $\frac{1}{n}(X-\overline{X})(X-\overline{X})^T$
   - 求出协方差矩阵的特征值及对应的特征向量，将特征值由大到小排序
   - 取最大的 $d$ 个特征值所对应的特征向量 $w_1,w_2,\dots ,w_d$
 
-- [x] $\textcolor{red}{输出}$ ：
+- [x] $\color{red}{输出}$ ：
   - 由此得到降维矩阵： $W'=(w_1,w_2,\dots ,w_d)$
   - 降维结果： $Y=W^T(X-\overline{X})$
 
@@ -3935,7 +3935,7 @@ G --> |循环直到输出深度语义表征| F
 
 ##### VGG：3×3感受野的叠加 vs 7×7感受野
 
-- [x] 可以看出，3个 $3×3$ 的卷积层堆叠之后的感受野范围( $\textcolor{blue}{蓝色框}$ )，和一个 $7×7$ 的卷积层相同。
+- [x] 可以看出，3个 $3×3$ 的卷积层堆叠之后的感受野范围( $\color{blue}{蓝色框}$ )，和一个 $7×7$ 的卷积层相同。
     - 一个 $7×7$ 卷积核参数量为： $7×7= 49$
     - 三个 $3×3$ 卷积核参数量为： $3×(3×3)= 27$ ，参数量减为原来的55%。
 
@@ -4112,7 +4112,7 @@ G --> |循环直到输出深度语义表征| F
 
 ##### GoogLeNet：1×1卷积
 
-- [x] $1×1$ 卷积保持特征图的空间维度不变，但可以减少通道维度大小，因此 `Inception` 模块引入 $\textcolor{cyan}{3个额外的1×1卷积层}$：
+- [x] $1×1$ 卷积保持特征图的空间维度不变，但可以减少通道维度大小，因此 `Inception` 模块引入 $\color{cyan}{3个额外的1×1卷积层}$：
 
 <p align="center">
   <img src="./img/1×1卷积.jpg" alt="1×1卷积">
@@ -4132,7 +4132,7 @@ G --> |循环直到输出深度语义表征| F
 
 - [x] 网络的参数总量约为5M， 是AIexNet的 $\frac{1}{12}$ (参数约为 $60M$ )，VGG16的 $\frac{1}{27}$ （参数约为 $138M$ )。
 
-- [x] 在之后的改进版本中，引入了 $\textcolor{pink}{Batch \ Normalization}$ 层来加速网络收敛。
+- [x] 在之后的改进版本中，引入了 $\color{pink}{Batch \ Normalization}$ 层来加速网络收敛。
 
 <p align="center">
   <img src="./img/GoogLeNet：其他细节.jpg" alt="GoogLeNet：其他细节">
@@ -4229,7 +4229,7 @@ G --> |循环直到输出深度语义表征| F
 
 - [x] 通过添加多条平行路径来增加网络的宽度，单路卷积变成多支路的多路卷积，每条支路结构一致。
 
-- [x] ResNeXt-50( $\textcolor{red}{32×4d}$ )和ResNet-50拥有几乎相同的参数，但是性能却更高，但相应的推理速度更慢(多分支需要单独处理)。
+- [x] ResNeXt-50( $\color{red}{32×4d}$ )和ResNet-50拥有几乎相同的参数，但是性能却更高，但相应的推理速度更慢(多分支需要单独处理)。
 
 <p align="center">
   <img src="./img/ResNeXt.jpg" alt="ResNeXt">
