@@ -2948,6 +2948,255 @@ B-->|PCA处理,例如取200个主成分|C[降维后可以在最小均方误差�
 
 <br>
 
+# 第六章 集成学习
+
+## 基本介绍
+
+### 集成学习
+
+- [x] Boosting
+  - 串行地训练一系列分类器，使得后来的基分类器更关注先前基分类器没有正确分类的数据，并最终将这些分类器进行结合
+
+- [x] Bagging
+  - 并行地训练多个分类器，采用自助采样(有放回的随机采样)得到多个训练子集，训练多个基分类器，并将这些分类器进行结合
+
+<p align="center">
+  <img src="./img/集成学习.jpg" alt="集成学习">
+</p>
+
+## Boosting方法
+
+- [x] 不同Boosting方法的区别
+  - 在每一轮如何调整训练数据的权重或概率分布
+  - 如何将弱分类器组合成强分类器
+
+> - AdaBoost是Boosting算法框架的一种具体实现
+
+- [x] AdaBoost基本思想
+  - 提高前一个弱分类器分类错误的样本的权重，以在后续弱分类训练中对这些样本更为关注
+  - 对于弱分类器的组合采用加权形式，提高分类误差率小的弱分类器的权值，以提高其表决的作用
+
+### AdaBoosting方法
+
+- [x] 任务：如下图，实现一个二分类问题
+
+<p align="center">
+  <img src="./img/AdaBoosting方法.jpg" alt="AdaBoosting方法">
+</p>
+
+#### 以人脸检测为例介绍AdaBoost方法和应用
+
+- [x] 人脸检测
+  - 目标：找出图像中所有人脸
+
+- [x] 实施方法:
+  - 步骤一：构建人脸分类器，用于判断输入矩形框是否为人脸
+    > - (1)依次构造T个基于 `Haar-like` 矩形特征的弱分类器用于人脸判断
+    > - (2)根据弱分类器准确率，调整弱分类器及错分样本权重
+    > - (3)将T个弱分类器集成强分类器
+  - 步骤二：遍历图片中所有矩形框，输入上述分类器检测人脸判断是否为人脸
+
+##### 人脸特征的表示方法
+
+- [x] `Haar-like` 特征
+  - 4种基本Haar-like特征原型，不同类型、大小、位置使特征种类大大增加，覆盖人脸各区域特征。
+
+<p align="center">
+  <img src="./img/人脸特征的表示方法.jpg" alt="人脸特征的表示方法">
+</p>
+
+- [x] 可以基于任意1个 `Haar-like` 特征构造1个弱分类器，每幅图像中存在上万个 `Haar-like` 特征，理论上可以构造上万个弱分类器
+
+##### 基于Haar-like特征人脸检测的集成学习方法
+
+- [x] 算法学习流程
+
+<p align="center">
+  <img src="./img/基于Haar-like特征人脸检测的集成学习方法.jpg" alt="基于Haar-like特征人脸检测的集成学习方法">
+</p>
+
+#### AdaBoost学习算法
+
+- [x] 学习流程
+  - $For \ t= 1,\dots ,T$
+    > - (1)归一化权重 $w_t$ ，使 $n$ 个样本的权重和为 $1$ ： $W_{t,i}=\frac{w_{t,i}}{\sum\limits_{j=1}^nw_{t,j}}$
+    > - (2) $For \ each \ j \ in \ F$ ,训练基于特征 $j$ 的弱分类器 $h$ ，计算其带权重的错误率 $\epsilon_j=\sum\limits_{i=1}^n w_{t,i}|h_j(x_i)-y_i|$
+    > - (3)上一步所有弱分类器中，选择误差最小的弱分类器，并从集合 $F$ 中移出该特征，得到: $h_t = \underset{h_j}{\arg\min}(\epsilon_j), \epsilon_t=\epsilon_j$
+    > - (4)定义 $e_i$ ，若 $x_i$ 被正确分类， $e_i=0$ ，否则 $e_i=1$ ；更新样本的权重 $w_{t+1,i}=w_{t,i}β_t^{1-e_i},β_t=\frac{\epsilon_t}{1-\epsilon_t}$
+    > > - 错误率越小， $β_t$ 越小，正确分类样本权重下降越多，错误样本权重不变
+
+- [x] 最终得到的强分类器
+ - $For \ t= 1,\dots ,T$
+
+$$H(x)=\begin{cases}
+1 ,& if \ \sum\limits_{t=1}^T α_th_t(x) \geq \frac{1}{2}\sum\limits_{t=1}^T α_t \newline
+0 ,& otherwise
+\end{cases}$$
+
+> - 其中 $α_t= \log \frac{1}{\beta_t}$ ，(弱分类器错误率越小， $β$ 越小， $α$ 越大)
+  - 以强分类器输出结果作为分类标准：
+    > - $H(x)$ 为1，则分类器判定为人脸
+    > - $H(x)$ 为0，则分类器判定为非人脸
+
+<p align="center">
+  <img src="./img/AdaBoost学习算法.jpg" alt="AdaBoost学习算法">
+</p>
+
+#### 人脸检测的计算量巨大
+
+- [x] 遍历所有可能的位置、大小，需要做多少次分类?
+  - $320×240$ 图像， $20×20$ 矩形框，步长1个像素，尺度缩小因子0.9，则大约有样本:
+  - $(320-20)×(240-20)(原图)+(0.9×320-20)×(0.9×240-20)(缩小0.9)+(0.9^2×320-20)×(0.9^2×240-20)(再缩小0.9)+\dots ≥300,000$
+
+- [x] 问题
+  - 如何进一步加速？
+    > - 用人脸检测器遍历不同大小和位置的矩形框，从而检测出所有人脸
+
+##### 如何进一步加速？
+
+- [x] `Haar-like` 特征值的快速计算
+  - 积分图法
+    > - 积分图的构造方式为 $(x，y)$ 左上方区域内所有像素值的和，记为 $ii(x，y)$ (红色区域像素值之和)
+    > - 定义： $ii(x,y)=\sum\limits_{x'\leq x,y' \leq y} i(x',y')$
+    > - 从左到右，从上到下遍历一次图片， $\color{red}{记录每个像素点的积分值}$
+
+<p align="center">
+  <img src="./img/如何进一步加速1.jpg" alt="如何进一步加速">
+</p>
+
+
+- [x] 快速的原因:省去了大量的重复运算
+
+###### 示例1
+
+- [x] $\alpha$ 区域的像素值为 $\alpha = ii(1)+ii(4)-[ii(2)+ii(3)]$ ，同理可得 $β= ii(3)+ii(6)- [ii(4)+ii(5)]$
+  - 则该矩形类型对应的 `Haar-like` 特征值为 $β-a$
+
+<p align="center">
+  <img src="./img/如何进一步加速2.jpg" alt="如何进一步加速">
+</p>
+
+###### 示例2
+
+- [x] $\alpha$ 区域的像素值为 $\alpha=ii(1)+ ii(6)- [ii(2)+ii(5)]$ ，同理可得 $β= ii(2)+ii(7)- [ii(3)+ ii(6)]$ ， $\gamma=ii(3)+ii(8)- [ii(4)+ ii(7)]$
+  - 则该矩形类型对应的 `Haar-like` 特征值为 $α+\gamma-β$
+
+<p align="center">
+  <img src="./img/如何进一步加速3.jpg" alt="如何进一步加速">
+</p>
+
+###### 示例3
+
+- [x] $\alpha$ 区域的像素值为 $\alpha=ii(1)+ ii(5)- [ii(2)+ii(4)]$ ，同理可得 $β= ii(2)+ ii(6)- [ii(3)+ ii(5)]$ ， $\gamma=ii(4)+ii(8)- [ii(5)+ii(7)]$ ， $\sigma=ii(5)+ii(9)- [ii(6)+ ii(8)]$
+  - 则该矩形类型对应的 `Haar-like` 特征值为 $\alpha +\sigma -β-\gamma$
+
+<p align="center">
+  <img src="./img/如何进一步加速4.jpg" alt="如何进一步加速">
+</p>
+
+##### 检测过程优化
+
+- [x] 构建从粗到细的沙漏型分类器组合，优化筛选过程
+
+<p align="center">
+  <img src="./img/检测过程优化.jpg" alt="检测过程优化">
+</p>
+
+##### 级联分类器
+
+- [x] 级联分类器
+
+<p align="center">
+  <img src="./img/级联分类器.jpg" alt="级联分类器">
+</p>
+
+- [x] 优化策略
+
+<p align="center">
+  <img src="./img/级联分类器1.jpg" alt="级联分类器">
+</p>
+
+> - 策略：在前期粗检测阶段，适当调低阈值，保证高召回率，允许一定的假阳率。以尽可能让人脸样本都进入下一轮分类，经过多个级联，逐步降低假阳率
+> - 举例：例如，共经过 $5$ 个级联，平均召回率为 $0.98$ ，假阳率是 $0.4$ ，最终的召回率是 $0.98^5= 0.90$ ,假阳率为 $0.4^5=0.01$
+
+## Bagging方法
+
+### 基本思想
+
+- [x] Bagging这一名称来源于 `Bootstrap AGGregatING` 的缩写。顾名思义，“自助”和“结合”是Bagging的两个关键。有放回的随机采样。每次采大小为 $m$ 的子样本集，重复 $T$ 次。
+
+<p align="center">
+  <img src="./img/Bagging方法.jpg" alt="Bagging方法">
+  <p align="center">
+   <span>Bagging方法</span>
+  </p>
+</p>
+
+### 随机森林
+
+<p align="center">
+  <img src="./img/随机森林.jpg" alt="随机森林">
+</p>
+
+- [x] 采用相对多数投票法集成上述3个基学习器得到随机森林模型。
+
+- [x] 例子： $X=\lbrace 学区＝有，面积＝100，价格=2.0，地址=蜀山\rbrace$ ,3个基学习器结果分别为“不合适”，“合适”，“合适”，最终得到结果为“合适”
+
+## 结合策略
+
+### 平均法(回归问题)
+
+- [x] 简单平均法
+  - 对多个基学习器预测求平均： $H(x)=\frac{1}{T}\sum\limits_{i=1}^Th_i(x)$
+
+- [x] 加权平均法
+  - 对多个基学习器预测求加权平均： $H(x)=\sum\limits_{i=1}^Tw_ih_i(x)$
+
+### 投票法（分类问题）
+
+- [x] 绝对多数投票法
+  - 即若某标记得票过半数，则预测结果为该标记，否则拒绝预测结果：
+
+$$H(x)=\begin{cases}
+c_j, & if \ \sum\limits_{i=1}^T h_i^j(x) > 0.5\sum\limits_{k=1}^N\sum\limits_{i=1}^Th_i^k(x); \newline
+reject, & otherwise.
+\end{cases}$$
+
+- [x] 相对多数投票法
+  - 预测结果为得票最多的标记，若多标记获得高票，则从中随机选一个：
+
+$$H(x)=c_{\arg\max\sum\limits_{i=1}^T h_i^j(x)}$$
+
+- [x] 加权投票法
+  - 对样本加权后进行投票预测:
+
+$$c_{\arg\max\sum\limits_{i=1}^T w_ih_i^j(x)}$$
+
+### 学习法(Stacking)
+
+- [x] 训练阶段
+  - 初始数据集 $D=\lbrace(x_1,y_1),(x_2,y_2),\dots ,(x_m,y_m)\rbrace$ ， $D$ 按比例分成训练初级学习器的数据集 $D_1$ 和用于训练次级学习器的数据集 $D_2$ 。
+
+<p align="center">
+  <img src="./img/学习法.jpg" alt="学习法">
+</p>
+
+## 总结
+
+- [x] 基本介绍
+
+- [x] Boosting方法
+  - AdaBoost：训练过程中，提高前一个弱分类器错误样本的权值，训练下一个弱分类器；集成弱分类器时，错误率低的弱分类器具有更高的权重。
+
+- [x] Bagging方法
+  - Bagging：并行训练多个分类器，采用自助采样得到训练子集，训练多个基分类器，并将这些分类器进行结合
+  - 随机森林：以决策树为基学习器，在采样过程中引入随机性来保证决策树的多样性
+
+- [x] 结合策略
+  - 平均法，投票法，学习法
+
+<br>
+
 # 第七章 深度学习:神经网络
 
 ## 神经网络定义
@@ -4472,7 +4721,7 @@ G --> |循环直到输出深度语义表征| F
 
 - [x] 第三步，物体分类
   - 提取候选区域的图像特征后，接下来需要判断该区域是否包含物体，属于哪一类物体？
-  - RCNN使用 `SVM` 进行物体分类，用二分类的方法依次判断物体是否属于定义的 $N$ 类物体、是否属于背景，共需训练 $(N+1)$ 个SVM二分类器
+  - `RCNN` 使用 `SVM` 进行物体分类，用二分类的方法依次判断物体是否属于定义的 $N$ 类物体、是否属于背景，共需训练 $(N+1)$ 个SVM二分类器
 
 <p align="center">
   <img src="./img/RCNN7.jpg" alt="选择性搜索流程">
@@ -4512,13 +4761,13 @@ G --> |循环直到输出深度语义表征| F
 
 ### SPPNet：让卷积计算共享
 
-- [x] SPP-Net解决CNN $\color{cyan}{计算冗余}$
+- [x] `SPP-Net` 解决 `RCNN` $\color{cyan}{计算冗余}$
 
 <p align="center">
   <img src="./img/SPPNet1.jpg" alt="SPPNet">
 </p>
 
-- [x] SPP-Net解决CNN $\color{cyan}{图像失真}$
+- [x] `SPP-Net` 解决 `RCNN` $\color{cyan}{图像失真}$
 
 <p align="center">
   <img src="./img/SPPNet2.jpg" alt="SPPNet">
@@ -4526,7 +4775,7 @@ G --> |循环直到输出深度语义表征| F
 
 #### SPP-Net的金字塔池化
 
-- [x] RCNN在原图层面上处理 `每一个候选区域` ，SPPNet一次性处理 `整张图` ，在特征图层面上使用金字塔池化处理每个候选区域。 **SPPNet其余流程与RCNN一致** 。
+- [x] `RCNN` 在原图层面上处理 `每一个候选区域` ， `SPPNet` 一次性处理 `整张图` ，在特征图层面上使用金字塔池化处理每个候选区域。 **SPPNet其余流程与RCNN一致** 。
 
 <p align="center">
   <img src="./img/SPPNet3.jpg" alt="SPPNet">
@@ -4543,16 +4792,203 @@ G --> |循环直到输出深度语义表征| F
   <img src="./img/SPPNet5.jpg" alt="SPPNet">
 </p>
 
+#### SPP-Net整体结构
+
+<p align="center">
+  <img src="./img/SPPNet6.jpg" alt="SPPNet">
+</p>
+
 #### 总结
 
-- [x] SPPNet与RCNN大致流程基本相同，但是SPP大大减少了卷积计算次数，速度提升了102倍
+- [x] `SPPNet` 与 `RCNN` 大致流程基本相同，但是SPP大大减少了卷积计算次数，速度提升了102倍
+
+### Fast RCNN：实现端到端训练
+
+#### Fast RCNN主要改进
+
+- [x] 前面两种方法将目标检测分为多个训练阶段，非端到端的方法步骤复杂、产生大量中间数据占用磁盘空间、训练速度慢， `Fast RCNN` 实现了更方便的端到端目标检测
+
+<p align="center">
+  <img src="./img/FastRCNN1.jpg" alt="FastRCNN">
+</p>  
+
+- [x] 具体来说主要针对以下几个问题进行了改进：
+
+<p align="center">
+  <img src="./img/FastRCNN2.jpg" alt="FastRCNN">
+</p>
+
+#### Fast RCNN框架
+
+- [x] 选择性搜索原图候选区域，采用预训练的CNN提取整张图的特征，在特征图上映射得到对应的候选区域
+
+<p align="center">
+  <img src="./img/FastRCNN3.jpg" alt="Fast RCNN框架">
+</p>
+
+#### Fast RCNN的RoI池化
+
+- [x] 基于 `SPP` 的思想，舍弃了金字塔设计，只采用一种尺寸的池化层
+
+- [x] 对每个候选区域，不论其尺寸大小，一律划分为 $7×7$ 个小区域,在每个小区域做最大值池化，得到 $7×7$ 个特征向量
+  - 若有K层特征图，候选区域特征图尺寸为 $21×42$ ，则有:
+    > - 最大值池化参数：池化区域大小为(3,6)、步长也为(3,6)池化输出： $7×7$ 个 $K$ 维特征向量
+
+<p align="center">
+  <img src="./img/FastRCNN4.jpg" alt="Fast RCNN框架">
+</p>
+
+#### Fast RCNN框架示例
+
+- [x] RoI池化后输出的特征向量，被直接用于训练物体分类及边界框回归
+
+- [x] 增加了分类分支与回归分支，使用多任务损失函数训练
+
+<p align="center">
+  <img src="./img/FastRCNN5.jpg" alt="Fast RCNN框架">
+</p>
+
+- [x] 多任务损失函数————分类损失
+
+<p align="center">
+  <img src="./img/FastRCNN6.jpg" alt="分类损失">
+</p>
+
+- [x] 采用多任务 `Loss` 函数同时训练分类和边界框回归
+  - 前三步与 `RCNN` 一致
+
+<p align="center">
+  <img src="./img/FastRCNN7.jpg" alt="分类损失">
+</p>
+
+- [x] 总体结构
+
+<p align="center">
+  <img src="./img/FastRCNN8.jpg" alt="总体结构">
+</p>
+
+- [x] 框架对比
+
+<p align="center">
+  <img src="./img/FastRCNN9.jpg" alt="框架对比">
+</p>
+
+- [x] `Fast RCNN` 实现了端到端训练，准确度提升，相较于 `RCNN` 训练速度快了9倍多，推理速度快了147倍
+
+<p align="center">
+  <img src="./img/FastRCNN10.jpg" alt="框架对比">
+</p>
+
+### Faster RCNN：特征图区域搜索
+
+#### Faster RCNN主要改进
+
+- [x] 前面三种方法都采用费时的选择性搜索在原图上搜索候选区域， `Faster RCNN` 基于此作出改进
+
+<p align="center">
+  <img src="./img/FasterRCNN1.jpg" alt="主要改进">
+</p>
+
+- [x] `Fast RCNN` 通过选择性搜索在原图上获得候选区域， `Faster RCNN` 通过区域提议网络( `RPN` )在特征图上获得候选区域，而后采用和 `Fast RCNN` 一样的方法进行进行分类和回归
+
+<p align="center">
+  <img src="./img/FasterRCNN2.jpg" alt="主要改进">
+</p>
+
+#### Faster RCNN怎么获得候选区域
+
+- [x] 区域提议网络(RPN)在特征图层面上进行候选区域的搜索，特征图尺寸远小于原图，搜索速度更快
+
+- [x] $\color{blue}{k个不同尺寸}$ 的Anchor(锚盒)(如下图箭头所示)，它们的中心点重合，在特征图上按照滑动窗口的方式进行滑动
+
+<p align="center">
+  <img src="./img/FasterRCNN3.jpg" alt="Faster RCNN怎么获得候选区域">
+</p>
+
+##### 区域提议网络(RPN)
+
+- [x] 提取每个锚盒所在区域的 $256$ 维特征， `cls-layer` 判断每个锚盒中存在物体的概率， `reg-layer` 回归边界框坐标
+
+- [x] 存在物体的概率超过阈值的锚盒将被保留作为候选区域
+
+<p align="center">
+  <img src="./img/FasterRCNN4.jpg" alt="区域提议网络">
+</p>
+
+#### RCNN系列网络的演化过程
+
+<p align="center">
+  <img src="./img/RCNN系列网络的演化过程.jpg" alt="RCNN系列网络的演化过程">
+</p>
+
+#### Faster RCNN
+
+- [x] `Faster RCNN` 实现了端到端的目标检测，且舍弃了原图候选区域搜索
+ - ~~1.每个候选区域单独计算CAA特征，不同候选区域多有重叠部分，浪费计算资源~~
+ - ~~2.传统CAA输入尺寸固定，归一化操作会使图像失真~~
+ - ~~3.非端到端网络，中间过程占用大量存储空间~~
+ - ~~4.在原图上搜索候选区域浪费大量时间~~
+
+- [x] 但 `Faster RCNN` 仍将物体定位与物体分类两个问题分开处理，这种分阶段的思想限制了预测的速度
 
 ## 单阶段目标检测
 
+### 单阶段方法介绍
+
+#### 简介
+
+- [x] 一次性完成物体定位与物体分类两个任务，不再额外提取候选区域
+
+- [x] 结构简单，计算快捷，实时性好
+
 <p align="center">
-  <img src="./img/ResNet.jpg" alt="ResNet">
-  <p align="center">
-   <span>ResNet</span>
-  </p>
+  <img src="./img/单阶段方法介绍.jpg" alt="单阶段方法介绍">
 </p>
 
+### YOLO：基础的单阶段目标检测方法
+
+- [x] YOLO是首个完全抛弃候选区域的目标检测方法(You Only LookOnce)
+
+- [x] 一次性预测图像中所有物体的边界框及类别，这里主要介绍YOLO的设计思想
+
+<p align="center">
+  <img src="./img/YOLO1.jpg" alt="YOLO">
+</p>
+
+#### YOLO的设计思想
+
+- [x] 将图像划为 $S×S$ 个网格，每个网格负责预测中心位于该网格内的物体
+
+- [x] 例如狗的中心点落在第4行第5列的格子里，则该格子负责预测狗
+
+<p align="center">
+  <img src="./img/YOLO2.jpg" alt="YOLO">
+</p>
+
+- [x] 输出都由 `CNN` 网络特征图直接预测得来
+
+- [x] 每个网格需要输出边界框信息和分类概率，边界框信息包括中心点坐标、宽、高与置信度五个数据
+
+<p align="center">
+  <img src="./img/YOLO3.jpg" alt="YOLO">
+</p>
+
+#### YOLO的网络结构
+
+- [x] 基于GoogleNet，YOLO网络结构如下图所示，输入图像，经过 $24$ 个卷积层，得到 $7×7×1024$ 的特征图，通过线性网络映射为 $S×S×(B×(4+1)+C)$ 的输出，一般取 $S=7、B=2、C=20$ (其中 $S$ 为划分的网格数， $B$ 为 $\color{blue}{每个网格对应的边界框数目}$ ， $4+1$ 为边界框坐标及置信度， $C$ 为类别概率)
+
+<p align="center">
+  <img src="./img/YOLO4.jpg" alt="YOLO">
+</p>
+
+#### YOLO总结
+
+- [x] 综合边界框与类别置信得分，得到物体的边界框与类别
+
+- [x] YOLO舍弃两阶段的范式，采用轻量级网络，泛化能力强，易训练且速度快，能够实时检测，但是精度低，无法检测小物体、重叠物体。在此基础上，YOLO系列已经发展到了第七版，即YOLOv1~YOLOv7
+
+<p align="center">
+  <img src="./img/YOLO5.jpg" alt="YOLO">
+</p>
+
+<br>
