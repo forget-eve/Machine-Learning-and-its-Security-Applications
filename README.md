@@ -2231,7 +2231,7 @@ $$\lambda _i=\underset{\substack{j \in \lbrace 1,\dots ,k \rbrace}}{\arg\min} d(
   <img src="./img/样本间距离计算.png" alt="样本间距离计算">
 </p>
 
-#### $k-means$ 算法
+#### $K-means$ 算法
 
 - [x] 算法流程
 
@@ -4992,3 +4992,217 @@ G --> |循环直到输出深度语义表征| F
 </p>
 
 <br>
+
+# 第十章 循环神经网络
+
+## 任务实例————引子
+
+### 词性标注
+
+- [x] `任务定义` ：词性标注是指为分词结果中的每个单词标注一个正确的词性，也即确定每个词是名词、动词、形容词或其他词性的过程。
+  - 例子：我|想| $\color{red}{花}$ 钱|买一束| $\color{red}{花}$ 。
+  - 标注结果：r|v| $\color{red}{v}$ |v|m|q| $\color{red}{n}$ (PKU词性标注集https://hanlp.hankcs.com/docs/annotations/pos/pku.html)(词性:r代词，v动词，m数词，q量词，n名词)
+    > - 这里两个“ `花` ”的词性不一样，是因为使用的语境不同。
+    > - 那么我们考虑提取特征时，不能只考虑单个词的特征，需要考虑 `上下文信息` ———— 语境
+
+### 思考
+
+- [x] 假设我们只考虑词级别特征，将每个词嵌入分别输出到同一个 `Neural Network` 中，若该模型 `无记忆性` ，如图一所示
+  - 那么在判断“花”的词性的时候 `不会考虑上文“一束”` ，无法确定是名词还是动词
+  - 即无记忆模型只能对单一词性的词做出判断， `无法解决需要结合语境判断` 的复杂词的词性标注
+任务实例一引子
+
+- [x] 如果模型 `有记忆性` ，如图二所示
+  - Memory中 `保存上文“一束”的信息` ，可以帮助确定“花”的词性为名词
+  - 即有记忆模型能够保存上文信息，就可以帮助 `需要结合语境判断的` 复杂词性做出判断
+
+<p align="center">
+  <img src="./img/思考1.jpg" alt="思考1">
+</p>
+
+## $Simple-RNN$
+
+### 计算过程(简化)————有memory的网络
+
+- `假设` 网络结构是 `identity mapping` ，输入输出相同
+
+<p align="center">
+  <img src="./img/计算过程.jpg" alt="计算过程">
+</p>
+
+- `解释` ：这里“花”对应的输出不仅依赖该字符，还依赖memory的值， `输出不是固定的` 。对于“花”这种多词性的字符，可以根据不同输出得到不同的词性。
+
+### 模型结构
+
+<p align="center">
+  <img src="./img/Simple-RNN模型结构.jpg" alt="Simple-RNN模型结构">
+  <p align="center">
+   <span>Simple-RNN模型结构</span>
+  </p>
+</p>
+
+### 计算过程
+
+- [x] 现考虑第+个时间步的计算过程:
+
+<p align="center">
+  <img src="./img/计算过程1.jpg" alt="计算过程">
+</p>
+
+- [x] 总结：第 $t$ 步计算相当于将输入特征 $x^t$ 和前一步的 $memory \ h^{t-1}$ 做一个线性加权，激活后得到第 $t$ 步的 $memory \ h^t$ ，再过一个线性层输出，得到第 $t$ 步的输出特征 $o^t$
+
+### 词性标注应用示例
+
+- [x] 假设网络为一层 `Simple-RNN` ,
+  - 输入特征为每个字符的词向量，输出特征为未归一化的词性概率分布
+  - 经过Sofmax，即可得到归一化的词性概率分布，概率最高的对应的词性即为预测的词性
+
+<p align="center">
+  <img src="./img/词性标注应用示例.jpg" alt="词性标注应用示例">
+</p>
+
+### 结构复杂化(双向)
+
+- [x] 单向RNN没办法处理所有词性依赖的case(下图给出一个需要依赖下文的case)
+
+- [x] 通过 `拼接两个单向RNN的输出特征` ，即可提取到融合上下文信息的特征
+
+<p align="center">
+  <img src="./img/双向RNN.jpg" alt="双向RNN">
+  <p align="center">
+   <span>双向RNN</span>
+  </p>
+</p>
+
+## $LSTM(Long \ short-term \ Memory)$
+
+### 回顾 $Simple-RNN$ 设计上的不足
+
+<p align="center">
+  <img src="./img/回顾Simple-RNN设计上的不足.jpg" alt="回顾Simple-RNN设计上的不足">
+</p>
+
+- [x] 选择性:
+  - 输入特征全部用于memory，没有对输入特征进行选择
+
+- [x] 信息不变性:
+  - Memory中特征只增不减，没有设计遗忘机制
+
+### 抽象概念图
+
+<p align="center">
+  <img src="./img/LSTM抽象概念图.jpg" alt="LSTM抽象概念图">
+  <br>
+  <br>
+  <img src="./img/LSTM抽象概念图1.jpg" alt="LSTM抽象概念图">
+  <p align="center">
+   <span>LSTM抽象概念图</span>
+  </p>
+</p>
+
+### LSTM在一个时间步做了什么？
+
+- 一.更新memory `推陈出新`
+  - [x] 参与元素：Input(输入), Forget gate(遗忘门信号), Input Gate(输入门控信号), Memory 分别记为 $z_t,f_t,i_t,c_{t-1}$
+  - [x] 输出元素：更新后的Memory，记为 $c_t$
+  - [x] 计算公式： $c_t=i_t×z_t+f_t×c_{t-1}$
+    > - 示例 [3.2,2.6,11.0]=[0.1,0.5,0.9]×[2,4,6]+[0.6,0.2,0.8]×[5,3,7] (Hadahard积)
+
+<p align="center">
+  <img src="./img/LSTM在一个时间步做了什么1.jpg" alt="LSTM在一个时间步做了什么">
+</p>
+
+- 二.由更新后的memory得出输出
+
+<p align="center">
+  <img src="./img/LSTM在一个时间步做了什么2.jpg" alt="LSTM在一个时间步做了什么">
+</p>
+
+### 真实LSTM结构
+
+- [x] 回顾之前，可知： `LSTM` 的逻辑是通过输入 $z_t$ 和三个门控信号 $f_t,i_t,o_t$ 来更新 `Memory` 以及输出 $h_t$ 。
+
+- [x] 在真实 `LSTM` 结构中：首先需要从真实的输入以及上一个时间步的输出 $x_t,h_{t-1}$ 获取 $z_t,f_t,i_t,o_t$
+
+<p align="center">
+  <img src="./img/真实LSTM结构.jpg" alt="真实LSTM结构">
+</p>
+
+#### LSTM计算过程
+
+- 0.准备工作-生成三个门控信号以及候选更新向量
+
+<p align="center">
+  <img src="./img/准备工作.jpg" alt="准备工作">
+</p>
+
+- 1.更新memory
+
+<p align="center">
+  <img src="./img/更新memory.jpg" alt="更新memory">
+</p>
+
+- 2.由更新后的memory得出输出
+
+<p align="center">
+  <img src="./img/由更新后的memory得出输出.jpg" alt="由更新后的memory得出输出">
+</p>
+
+##### LSTM计算过程(总)
+
+- 0.准备工作-生成三个门控信号以及候选更新向量
+- 1.更新memory
+- 2.由更新后的memory得出输出
+
+<p align="center">
+  <img src="./img/LSTM计算过程(总).jpg" alt="LSTM计算过程(总)">
+</p>
+
+### 双向 $LSTM$ 
+
+- [x] 把输入特征按正向和逆序 `分别输入到两个单向LSTM中` ，得到正向和逆向的输出特征
+
+- [x] 将正向逆向的 `输出特征拼接` 后得到双向LSTM的输出特征
+
+### LSTM比Simple-RNN好在哪里?
+
+- [x] 结论： `LSTM` 在一定程度上可以防止 `长距离` (时间步上)的 `梯度消失`
+  - 子问题一：为什么 `Simple-RNN` 会出现梯度消失？
+    > - 可以看到在 `Simple-RNN` 的结构中 `Memory` 存在矩阵参数 $W$ 的累乘，相应的在训练时求偏导数时也存在连乘
+    > - 当偏导数 $\frac{\partial{h^i}}{\partial{h^{i-1}}}$ 小于1，那么在长距离建模时的 $h^t$ 对 $h^i$ (i<<t)偏导数趋于0，所以存在长距离的梯度消失的现象。
+    > - `公式推导` $h^t= tanh(Wh^{t-1}+Ux^t+b) \rightarrow \prod\limits_{i=1}^t \frac{\partial{h^i}}{\partial{h^{i-1}}}=\prod\limits_{i=1}^t (tanh'×W)$
+  - 子问题二：为什么LSTM可以防止梯度消失？
+    > - `LSTM` 中 `Memory cell` 的更新是 `加性的` ( $c_t=i_t×z_t+f_t×c_{t-1}$ )，依然依赖上一步的 `Memory` ，除非 `Forget Gate` 将原有 `Memory` 清空。
+    > - $h^t$ 可以通过 $c^t$ 将梯度传到长距离的 $c^i$ (i《《t),进而传到 $h^i$ ，不容易出现梯度消失的现象( $h^t$ 存在多条梯度路径传播到 $h^i$ ，其中一条路径不出现梯度消失，那么总梯度不会消失)
+
+<p align="center">
+  <img src="./img/LSTM结构图.jpg" alt="LSTM结构图(总)">
+</p>
+
+#### 梯度爆炸→梯度裁剪
+
+- [x] 现象：同样的，由于权重矩阵连乘的原因， `Simple-RNN` 在训练还可能出现梯度爆炸的情况，这一点 `LSTM` 也存在。
+
+- [x] 结果：梯度爆炸会导致训练过程不平滑，最终难以收敛。
+
+- [x] 解决方式：最直接的解决方式为梯度裁剪
+  - 什么是梯度裁剪?
+    > - 如字面意思一样，将梯度超过某一阈值(如20)的值置为该阈值。
+
+## $GRU$
+
+### GRU特点
+
+- [x] 结构上，比LSTM简单，参数少(少了一个门控信号)
+
+- [x] 训练上，与LSTM相比，计算更有效率，成本更低
+
+- [x] 在长距离的梯度上，与LSTM一样，可以一定程度上避免长距离梯度消失的问题
+
+# 第十二章 Transformer
+
+## 序列-序列任务
+
+## 自注意力机制
+
+## $Transformer$ 模型
