@@ -3744,7 +3744,7 @@ $$\frac{\partial{a^l}}{\partial{a^k}}=\frac{\partial{a^l}}{\partial{a^{l-1}}}·\
 
 #### 层归一化定义
 
-- [x] 同样假设某层的输入为 $z=[z_1,z_2,\dots ,z_m]$ ，维度为 $m$ ，也就是该层神经元个数。与批量归一化不同，层归一化是针对每个输入的样本 $z$ ，分别做归一化:
+- [x] <span id="cengguiyihua">同样</span>假设某层的输入为 $z=[z_1,z_2,\dots ,z_m]$ ，维度为 $m$ ，也就是该层神经元个数。与批量归一化不同，层归一化是针对每个输入的样本 $z$ ，分别做归一化:
 
 $$\mu=\frac{1}{m} \sum\limits_{i=1}z_i$$
 $$\sigma^2=\frac{1}{m} \sum\limits_{i=1}(z_i-\mu)^2$$
@@ -5191,6 +5191,21 @@ G --> |循环直到输出深度语义表征| F
 
 ## $GRU$
 
+### GRU结构图
+
+<p align="center">
+  <img src="./img/GRU结构图.jpg" alt="GRU结构图">
+</p>
+
+- [x] 前向计算过程
+  - 1.两个门控信号的计算：重置门 $r_t$ ，更新门 $z_t$
+    > - $r_t=\sigma (W_r·[h_{t-1},x_t])$
+    > - $z_t=\sigma (W_z·[h_{t-1},x_t])$
+  - 2.候选状态向量层 $\tilde{h_t}$ 以及最终状态向量 $h_t$ ，的计算:
+    > - $\tilde{h_t} = tanh(W·[r_t*h_{t-1},x_t]) \rightarrow 重置门将重置memory与输入特征一起构成候选状态向量\tilde{h_t}$
+    > - $h_t = (1-z_t)*h_{t-1}+z_t *h_t$
+    > > - $(1-z_t),z_t$ 更新门将候选状态向量和上一步的memory线性组合起来构成新的memory/输出特征 $h_t$ 。
+
 ### GRU特点
 
 - [x] 结构上，比LSTM简单，参数少(少了一个门控信号)
@@ -5199,10 +5214,393 @@ G --> |循环直到输出深度语义表征| F
 
 - [x] 在长距离的梯度上，与LSTM一样，可以一定程度上避免长距离梯度消失的问题
 
+## RNNs
+
+- [ ] `Simple RNN` vs `LSTM` vs `GRU`
+
+
+<div align="center">
+  <table>
+  <tr>
+    <th>时间线</th>
+    <th>Simple RNN</th>
+    <th>LSTM</th>
+    <th>GRU</th>
+  </tr>
+  <tr>
+    <td>参数量</td>
+    <td>少</td>
+    <td>多</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>训练难度</td>
+    <td>高</td>
+    <td>低</td>
+    <td>低</td>
+  </tr>
+  <tr>
+    <td>模型性能</td>
+    <td>差</td>
+    <td>好</td>
+    <td>好</td>
+  </tr>
+</table>
+</div> 
+
+<br>
+
 # 第十二章 Transformer
 
 ## 序列-序列任务
 
+### 任务定义
+
+- [x] 定义：输入和输出均为序列的任务，称为序列-序列任务(Sequence-to-sequence,Seq2seg)
+
+- [x] 常见的序列-序列任务包括机器翻译、生成式问答、生成式摘要等任务
+
+- [x] 在Seq2seq任务中，输入和输出长度不一定相同
+  - 机器翻译
+    > - (CN)我爱深度学习。 $\rightarrow$  I love deep learning.(EN)
+  - 生成式摘要
+    > - (原文)今天，国家航天局和中国科学院联合发布了中国首次火星探测火星全球影像图...
+    > - (摘要)中国绘制的火星全球影像图发布
+
+### 编码器-解码器模型(Encoder-Decoder)
+
+- [x] 输入和输出不等长的Seq2seq任务，最常用的模型为 `编码器-解码器模型`
+  - `编码器(Encoder)` ：读取输入序列 $\lbrace x_1,\dots ,x_l \rbrace$ ，将其编码为维数固定的上下文向量 $c:c= Encoder(x_1,x_2,\dots ,x_l)$
+  - `解码器(①Decoder)` ：读取上下文向量 $c$ ，依次生成目标序列 $\lbrace y_1,\dots ,y_T \rbrace : \lbrace y_1,\dots ,y_T \rbrace = Decoder(c)$
+
+<p align="center">
+  <img src="./img/编码器-解码器模型.jpg" alt="编码器-解码器模型">
+</p>
+
+- [x] 编解码器可以使用前述 `RNN` 模型，然而其存在一些局限性
+
+#### RNN模型的局限性(一)
+
+- [x] 将 `RNN` 中每个单元的输出称作 `隐向量(Hidden Statc)` ， `单向RNN模型` 编码时仅使用了 `从左到右` 的信息
+
+- [x] 加入反向的结构将正反向的 `Hidden State` 连接起来，构成双向语言模型，但仍然存在长期依赖问题：序列中两个Token距离越远，信息传递就要经过越多次RNN单元的计算，此过程中的连乘容易造成梯度消失/爆炸，导致模型难以学习
+
+<p align="center">
+  <img src="./img/RNN模型的局限性1.jpg" alt="RNN模型的局限性">
+</p>
+
+#### RNN模型的局限性(二)
+
+- [x] 解码时，不同时间步关注的信息没有重点
+
+<p align="center">
+  <img src="./img/RNN模型的局限性2.jpg" alt="RNN模型的局限性">
+</p>
+
 ## 自注意力机制
 
+### Self-Attention
+
+#### 什么是Self-Attention
+
+- `SelfAttention` ：序列与自身之间进行的 `Atention` 机制(计算序列中某一位置的隐状态时，考察该位置与本序列中不同位置之间的关联)
+
+<p align="center">
+  <img src="./img/什么是Self-Attention.jpg" alt="什么是Self-Attention">
+</p>
+
+#### Self-Attention的原理
+
+- [x] Self-Attention原理：用多个输入向量的加权平均(线性组合)构成某一个位置的隐状态
+
+<p align="center">
+  <img src="./img/Self-Attention原理.jpg" alt="Self-Attention原理">
+</p>
+
+- [x] `Self-Attention` 的计算可以视为一种查找过程
+  - 假设对于序列中的每一个位置，都存在对应的 `Query` ， `Key` 和 `Value` 向量，记为 `Q,K,V`
+  - 当计算某一个位置的隐状态时，相关程度的计算可以看成使用该位置的 `Query` 与不同位置 `Key` 匹配的过程。而匹配结果作为权重，对 `Value` 进行加权求和，得到最终的隐状态。
+  - 实际计算时， `Q,K,V` 向量由输入向量与三个不同的投影矩阵相乘得到
+
+<p align="center">
+  <img src="./img/Self-Attention原理1.jpg" alt="Self-Attention原理">
+</p>
+
+- [x] 如何计算向量的相关程度
+
+<p align="center">
+  <img src="./img/如何计算向量的相关程度.jpg" alt="如何计算向量的相关程度">
+</p>
+
+- [x] Self-Atention计算过程(向量)
+
+<p align="center">
+  <img src="./img/Self-Atention计算过程(向量).jpg" alt="Self-Atention计算过程(向量)">
+</p>
+
+- [x] Self-Attention计算过程(矩阵)————计算 `QKV` 矩阵
+
+<p align="center">
+  <img src="./img/Self-Atention计算过程(矩阵).jpg" alt="Self-Atention计算过程(矩阵)">
+</p>
+
+- [x] Self-Attention计算过程(矩阵)————计算点积相似度
+
+<p align="center">
+  <img src="./img/Self-Atention计算过程(矩阵)1.jpg" alt="Self-Atention计算过程(矩阵)">
+  <br>
+  <br>
+  <img src="./img/Self-Atention计算过程(矩阵)2.jpg" alt="Self-Atention计算过程(矩阵)">
+</p>
+
+- [x] Self-Attention计算过程(矩阵)————加权构成输出
+
+<p align="center">
+  <img src="./img/Self-Atention计算过程(矩阵)3.jpg" alt="Self-Atention计算过程(矩阵)">
+</p>
+
+- [x] Self-Attention计算过程(矩阵)————完整流程
+
+<p align="center">
+  <img src="./img/Self-Atention计算过程(矩阵)4.jpg" alt="Self-Atention计算过程(矩阵)">
+</p>
+
+### 进阶：Multi-Head Attention
+
+- [x] 相关性有很多种情况，可以用多组 $q,k,v$ 向量计算 `Attention` 来建模不同的相关性
+
+<p align="center">
+  <img src="./img/Multi-Head Attention.jpg" alt="Multi-Head Attention">
+</p>
+
+### 使用Attention解决Seq2seq问题
+
+- [x] 编码器和解码器内部使用 `Self-Attention` ，计算词表示时考虑上下文信息并解决长距依赖问题
+
+- [x] 编码器和解码器之间使用 `Cross-Atention` ，使得解码过程中有重点地关注输入序列的不同部分
+
+- [x] 使用Attention提高了计算效率
+
+<p align="center">
+  <img src="./img/使用Attention解决Seq2seq问题.jpg" alt="使用Attention解决Seq2seq问题">
+</p>
+
 ## $Transformer$ 模型
+
+### Transformer模型结构
+
+- [x] Transformer是一种编解码器模型
+
+<p align="center">
+  <img src="./img/Transformer模型结构.jpg" alt="Transformer模型结构">
+  <p align="center">
+   <span>Transformer模型结构</span>
+  </p>
+</p>
+
+### Transformer整体结构
+
+- [x] 模型结构对应关系
+
+<p align="center">
+  <img src="./img/模型结构对应关系.jpg" alt="模型结构对应关系">
+  <p align="center">
+   <span>模型结构对应关系</span>
+  </p>
+</p>
+
+### Transformer的输入层
+
+- [x] Embedding是什么
+  - 句子中的 `Token` 无法直接用于模型计算，需要将其转化成定量表示
+  - `Embedding` ：使用连续值向量来表示 `Token`
+
+- [x] `Transformer` 的 `Embedding`
+  - `Input Embedding(词向量)` + `Positional Encoding(位置向量)`
+  - 词向量中包含了语义信息
+  - 位置向量中包含了位置信息
+
+<p align="center">
+  <img src="./img/Transformer的输入层.jpg" alt="Transformer的输入层">
+</p>
+
+#### Input Embedding(词向量)
+
+- [x] 根据已有的语料库构建 `Token` 词表，其中每一个Token均对应一个唯一的序号，词表大小为 $d_{vocab}$
+
+- [x] 将输入序列中的 `Token` 用其在词表中的序号表示，并转化成长度为词表大小的 `one-hot` 向量，序号对应的位置是1，其他位置是0
+
+<p align="center">
+  <img src="./img/词向量.jpg" alt="词向量">
+</p>
+
+- [x] 全连接层的参数可学习，随着模型训练，学习最合适的词向量
+
+<p align="center">
+  <img src="./img/词向量1.jpg" alt="词向量">
+</p>
+
+#### Positional Encoding(位置向量)
+
+- [x] Self-Attention中没有递归或卷积等可以感知序列拓扑信息的结构
+
+- [x] 通过在输入中添加 `Positional Encoding` 实现对位置信息的编码
+
+<p align="center">
+  <img src="./img/位置向量.jpg" alt="位置向量">
+</p>
+
+- [x] 对于序列中第 `pos` 个 `Token` ，其位置向量为 $PE_{pos}$
+
+- [x] $PE_{pos}$ 可以用以下公式表达:
+  - $PE_{(pos,2i)} = sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}})$
+  - $PE_{(pos,2i+1)}= cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}})$
+  - 其中 $i=0,1,2,\dots , \lfloor \frac{d_{model}}{2}\rfloor$
+
+- [x] 即： $PE_{pos}$ 的奇数位和偶数位分别为上述正弦和余弦值
+
+- [x] `Positional Embedding` 是 $\color{cyan}{静态、不可学习的}$
+
+#### 输入层的输出
+
+- [x] 对于序列中的每个 `Token` ，将对应的词向量与位置向量相加，得到该 `Token` 的向量表示，并送入编、解码器中进行后续计算:
+  - `Input Embedding(词向量)` + `Positional Encoding(位置向量)`
+
+<p align="center">
+  <img src="./img/输入层的输出.jpg" alt="输入层的输出">
+</p>
+
+### Transformer的编码器
+
+<p align="center">
+  <img src="./img/Transformer的编码器.jpg" alt="Transformer的编码器">
+</p>
+
+#### Multi-Head Attention
+
+<p align="center">
+  <img src="./img/Transformer的编码器1.jpg" alt="Transformer的编码器">
+</p>
+
+- [x] 其输入 $I$ 为当前 `Block` 的输入：
+  - 若当前Block为第一个Block，则 $I$ 为输入层的输出
+  - 若当前Block不是第一个Block，则 $I$ 为上一个 `Block` 的输出
+
+- [x] 计算过程：
+  - $Q,K,V=W^qI,W^kI,W^vI$
+  - $Q^i=QW^Q_i,K^i=KW^K_i,V^i=VW^V_i$
+  - $head^i=Attention(Q^i,K^i,V^i)=softmax\left(\frac{Q^i(K^i)^T}{\sqrt{d_k}}\right)·V^i \ 其中, \sqrt{d_k}=\frac{d_{model}}{h},h为head数量$
+  - $MultiHead(Q,K,V)(\color{blue}{输出})=Concat(head^1,\dots, head^h)W^0$
+
+- [x] 注意到 `Atention` 公式的形式与之前有两处不同：矩阵计算的顺序和 $\sqrt{d_k}$ 的存在
+  - $Attention(Q,K,V)= V·Softmax(K^TQ)(旧),Attention(Q,K,V)= softmax\left(\frac{Q(K)^T}{\sqrt{d_k}}\right)·V(新)$
+
+- [x] 矩阵汁算顺序问题：
+  - 前文为作图方便考虑，将不同 `token` 对应的 $q,k,v$ 当做 `列向量` ，而此处当做 `行向量`
+  - 记新的公式中 $Q,K,V$ 为 $Q',K',V'$ ，则有 $Q=Q^T,K'=K^T,V'=V^T$
+  - 则有 $Q'K'^T =Q^T(K^T)^T=Q^TK=(K^TQ)^T$
+  - 记 $Sofmax$ 的结果为 $A$ 和 $A'$ ( $Softmax$ 分别沿列和行归一化)
+  - 则有 $A'=A^T,A'V'=A^TV^T=(VA)^T$
+  - 输出仍分别为列向量、行向量的情况下，两种公式形式等价
+
+- [x] `Add & Norm`
+  - 公式 $LayerNorm(x+Sublayer(x))$
+  - `Add` ：残差连接，将多头注意力层的输入与输出直接相加
+  - `Nom` ：层归一化 `Layer Normalization`
+
+<p align="center">
+  <img src="./img/Transformer的编码器2.jpg" alt="Transformer的编码器">
+</p>
+
+#### 回顾LayerNorm
+
+- [x] <kbd><a href="#/?id=cengguiyihua">回顾LayerNorm</a></kbd>
+
+#### Point-wise Feed-Forward Netwoks
+
+- [x] 公式 $FFN(x)=max(O,xW_1+b_1)W_2+b_2$
+
+- [x] 两个线性层 $(W_1,b_1)(W_2,b_2)$ ，并通过 `ReLU` 单元 $max(0,f(x))$ 连接
+
+- [x] Position-wise
+  - 该函数独立、并行地用于序列中的每个向量
+  - 即序列中每个位置的向量通过相同的线性层和 `ReLU` 单元
+
+### Transformer的解码器
+
+<p align="center">
+  <img src="./img/Transformer的解码器.jpg" alt="Transformer的解码器">
+</p>
+
+- [x] 训练时可以并行解码
+
+<p align="center">
+  <img src="./img/Transformer的解码器2.jpg" alt="Transformer的解码器">
+</p>
+
+#### Masked Multi-Head Attention
+
+<p align="center">
+  <img src="./img/Transformer的解码器1.jpg" alt="Transformer的解码器">
+</p>
+
+- [x] Causal Mask
+  - 并行解码会导致后文也参与atention的计算，但解码器实际上不应该看到后文内容。因此，需要通过Mask使模型在计算隐状态时只关注前文的内容。
+  - 以输出第二个 `Token` 为例
+
+<p align="center">
+  <img src="./img/Transformer的解码器3.jpg" alt="Transformer的解码器">
+</p>
+
+#### Multi-Head Atention(Cross Attention)
+
+- [x] 计算方法与编码器 `SelfAttention` 相同，但用到来自编码器的隐向量
+
+<p align="center">
+  <img src="./img/Transformer的解码器4.jpg" alt="Transformer的解码器">
+</p>
+
+### Transformer的输出层
+
+<p align="center">
+  <img src="./img/Transformer的输出层.jpg" alt="Transformer的输出层">
+</p>
+
+#### 如何获得下一个Token的概率分布
+
+- [x] 对于要预测的第 $i$ 个 `Token` ，解码器的输出是一个长度为 $d_{model}$ 的向量,记为 $o_i$
+
+- [x] $o_i$ 经全连接层映射为一个长度为 $d_[vocab}$ 的向量，并通过 $Softmax$ 归一化
+
+$$p_i = Softmax(Linear(o_i)$$ 
+
+- [x] $p_i$ 代表了该位置是词表中不同 `Token` 的概率
+
+<p align="center">
+  <img src="./img/Transformer的输出层1.jpg" alt="Transformer的输出层">
+</p>
+
+### Transformer结构总结
+
+<p align="center">
+  <img src="./img/Transformer结构总结.jpg" alt="Transformer结构总结">
+</p>
+
+### Transformer解决了RNN的问题吗
+
+- [x] 解码时，不同时间步关注的信息没有重点
+  - 通过在解码器的 `Atention` 中引入编码器的隐向量，建模输入序列中不同位置对输出的影响
+
+<p align="center">
+  <img src="./img/Transformer解决了RNN的问题吗1.jpg" alt="Transformer解决了RNN的问题吗">
+</p>
+
+- [x] 模型训练不能并行，效率差
+  - 通过在训练时引入 `Teacher Forcing` 机制，使得 `Hidden State` 的计算可以并行处理，同时引入 `Attention Mask` ，使得训练过程更为接近真实的预测过程
+
+<p align="center">
+  <img src="./img/Transformer解决了RNN的问题吗2.jpg" alt="Transformer解决了RNN的问题吗">
+</p>
+
+<br>
+
