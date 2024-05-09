@@ -6193,3 +6193,73 @@ B --> C[分类器训练]
 </p>
 
 <br>
+
+# 第十五章 视觉生成
+
+## 深度生成模型概述
+
+### What are Deep Generative Models?
+
+- [x] 深度生成模型(Deep Generative Models)
+  - 通过神经网络(参数 $\theta$ )学习概率分布 $p_{\theta}(X)$ 来近似/拟合潜在的复杂真实数据分布 $p(X)$
+  - 神经网络的输入：一个可计算先验分布 $q(Z)$ 中采样的隐变量 $2$
+  - 神经网络的输出：生成的新数据 $x \sim p_{\theta}(X)$ ， $p_{\theta}(X)$ 与真实数据分布 $p(X)$ 近似
+  - 即，神经网络将 $\color{red}{可计算的先验分布q(Z)映射为与真实数据分布p(X)相似的复杂概率分布p_{\theta}(X)}$
+    - 可计算：指的是先验分布需要有明确的数学解析式，这样生成过程时才可以从其中采样隐变量 $z$ 
+    - 先验分布通常选为 $\color{red}{高斯分布(标准正态分布)}$
+  - 根据神经网络拟合真实数据分布 $p(X)$ 方式的不同，深度生成模型可以分为以下两类：
+    - ①显式密度生成模型：显式地对真实数据分布函数(即，数据的密度函数) $p(X)$ 进行定义并求解
+    - ②隐式密度生成模型：不直接定义 $p(X)$ ，而是以一种隐式的方式去学习 $p(X)$
+
+$$主流深度生成模型的分类\begin{cases}
+显式密度生成模型
+(Explicit density estimation)\begin{cases}
+变分自编码器VAE
+(Variational Autoencoders)\newline
+扩散模型DM
+(Difuslon Models)\newline
+自回归模型ARM
+(Autoregress Models)\newline
+基于流的模型FM
+(Flow-based Models)\newline
+\end{cases}
+隐式密度生成模型
+(Implicit density estimation) \rightarrow 
+生成对抗网络GAN
+(Generative Adversarial Network)\newline
+\end{cases}
+$$
+
+### Why Deep Generative Models are important?
+
+- [x] 以深度生成模型为基础的AIGC(AI-Generated Content)大幅提升了生产力
+  - 机器辅助人
+    - 辅助大批量内容生产
+    - 改进内容生产人工操作，生成内容初稿
+    - 替代既有创意产生后机械性劳动
+  - 机器“替代”人
+    - AI生成内容达到专业水平
+    - 根据用户需求生成个性化定制终稿
+    - 替代大部分专业内容生产者
+
+- [x] 生成更深层次的理解
+
+- [x] 科技巨头/初创公司退出并不断迭代更强大的生成大模型/生成应用
+
+### How do Deep Generative Models evolve?
+
+- [x] Deep Learning Era [2013~2021]
+  - 生成模型： `生成对抗网络(GAN)为主导` ，其他类生成模型发展较为缓慢;
+  - 数据集规模：十万级(MSCOCO)~百万级(ImageNet);
+  - 模型参数：一亿参数规模(~100 Million);
+
+ - [x] Large-Scale Era [2021(DALL-E)~Now]
+  - 2021年1月，第一个(文本生成图像)生成大模型DALL-E采用自回归生成结构，通过大数据(2.5亿)与大模型(120亿参数，即12Billion)远超以往基于生成对抗网络方法的生成效果
+    - 扩散模型Difusion Model与自回归模型Auto-Regressive Model(ARM)因其稳定训练(stable-training)与优良的可拓展性(scalability)成为大模型的首选结构，基于生成对抗网络GAN大模型也在发展；
+    - 模型参数：十亿~两百亿参数(~1B至~20B);
+    - 数据规模：亿级以上;
+    - 计算资源：所需计算资源一般在256张A100(或者TPU-v4)规模
+  - 随着生成质量的不断提高，对大模型生成的可控性要求也逐渐提高
+  
+
+
