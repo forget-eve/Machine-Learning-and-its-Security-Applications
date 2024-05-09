@@ -6261,5 +6261,22 @@ $$
     - 计算资源：所需计算资源一般在256张A100(或者TPU-v4)规模
   - 随着生成质量的不断提高，对大模型生成的可控性要求也逐渐提高
   
+## 显式密度生成模型
 
+- [x] 近似显式模型(Approximate density)：对数据分布(数据密度) $p(X)$ 的定义方式导致其无法直接求解，转而优化某个近似解
+  - 变分自编码器 Variational Autoencoders
+  - 扩散模型 Diffusion Models
 
+- [x] 易解显式模型(Tractable density)：直接优化所定义的数据分布 $p(X)$ 
+  - 自回归模型 Autoregressive Models
+  - 基于流的模型 Flow-based Models
+
+- [x] 两者的区别在于：对数据分布(数据密度)估计方式不同，由此带来其密度估计是否可直接求解的差异
+
+### 变分自编码器 Variational Autoencoders
+
+- [x] 这里提供 <kbd><a href="https://zhuanlan.zhihu.com/p/144649293">参考资料</a></kbd>
+
+- [x] 感觉PPT没有这个讲的清楚。
+
+### 扩散模型 Diffusion Models
