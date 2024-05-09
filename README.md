@@ -6276,7 +6276,11 @@ $$
 ### 变分自编码器 Variational Autoencoders
 
 - [x] 这里提供 <kbd><a href="https://zhuanlan.zhihu.com/p/144649293">参考资料</a></kbd>
-
-- [x] 感觉PPT没有这个讲的清楚。
+  - 感觉PPT没有这个讲的清楚。
 
 ### 扩散模型 Diffusion Models
+
+#### 扩散模型的基本思想
+
+- [x] 图像生成过程：将一个从高斯分布中的采样的隐变量(高斯噪声)映射到真实图像
+  - 这里提供 <kbd><a href="https://www.zhangzhenhu.com/aigc/%E6%89%A9%E6%95%A3%E6%A6%82%E7%8E%87%E6%A8%A1%E5%9E%8B.html">参考资料</a></kbd>
