@@ -6284,3 +6284,11 @@ $$
 
 - [x] 图像生成过程：将一个从高斯分布中的采样的隐变量(高斯噪声)映射到真实图像
   - 这里提供 <kbd><a href="https://www.zhangzhenhu.com/aigc/%E6%89%A9%E6%95%A3%E6%A6%82%E7%8E%87%E6%A8%A1%E5%9E%8B.html">参考资料</a></kbd>
+
+#### 自回归模型 Autoregressive Models
+
+- 这里提供 <kbd><a href="https://aws.amazon.com/cn/what-is/autoregressive-models/">参考资料</a></kbd>
+
+#### 基于流的模型 Flow-based Models
+
+- 这里提供 <kbd><a href="https://www.gwylab.com/note-flow_based_model.html">参考资料</a></kbd>
