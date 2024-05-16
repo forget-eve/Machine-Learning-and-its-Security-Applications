@@ -6292,3 +6292,9 @@ $$
 #### 基于流的模型 Flow-based Models
 
 - 这里提供 <kbd><a href="https://www.gwylab.com/note-flow_based_model.html">参考资料</a></kbd>
+
+# 第十六章 预训练模型
+
+## 第1阶段：预训练词向量
+
+## 预训练语言模型
